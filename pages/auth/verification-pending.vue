@@ -20,7 +20,9 @@
 
 <script setup lang="ts">
 definePageMeta({
-  layout: 'blank'
+  middleware: 'auth',
+  layout: 'blank',
+  authPage: true
 })
 
 const auth = useAuth()

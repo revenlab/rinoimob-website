@@ -5,7 +5,7 @@ export default defineNuxtRouteMiddleware(async (to, from) => {
   await auth.initializeAuth()
 
   const requiresAuth = to.meta.requiresAuth
-  const isPublic = to.meta.public
+  const isAuthPage = to.meta.authPage
 
   if (requiresAuth && !auth.isAuthenticated.value) {
     return navigateTo({
@@ -14,7 +14,7 @@ export default defineNuxtRouteMiddleware(async (to, from) => {
     })
   }
 
-  if (isPublic && auth.isAuthenticated.value && (to.path === '/auth/login' || to.path === '/auth/register')) {
+  if (isAuthPage && auth.isAuthenticated.value) {
     return navigateTo('/dashboard')
   }
 })

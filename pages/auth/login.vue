@@ -64,10 +64,11 @@ import type { LoginRequest } from '~/types/auth'
 
 definePageMeta({
   middleware: 'auth',
-  layout: 'blank'
+  layout: 'blank',
+  authPage: true
 })
 
-const router = useRouter()
+const route = useRoute()
 const auth = useAuth()
 const authApi = useAuthApi()
 
@@ -87,7 +88,12 @@ const handleLogin = async () => {
     auth.setTokens(response.accessToken, response.refreshToken)
     auth.setUser(response.user)
 
-    await router.push('/dashboard')
+    const redirect = route.query.redirect as string
+    if (redirect && redirect.startsWith('/')) {
+      await navigateTo(redirect)
+    } else {
+      await navigateTo('/dashboard')
+    }
   } catch (err) {
     auth.error.value = err instanceof Error ? err.message : 'Login failed'
   } finally {

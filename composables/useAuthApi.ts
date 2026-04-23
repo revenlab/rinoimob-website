@@ -18,14 +18,16 @@ export const useAuthApi = () => {
   }
 
   const verifyEmail = async (token: string) => {
-    return $fetch(`${API_BASE_URL}/auth/verify-email?token=${token}`, {
-      method: 'POST'
+    return $fetch(`${API_BASE_URL}/auth/verify-email`, {
+      method: 'POST',
+      body: { token }
     })
   }
 
   const forgotPassword = async (email: string) => {
-    return $fetch(`${API_BASE_URL}/auth/forgot-password?email=${email}`, {
-      method: 'POST'
+    return $fetch(`${API_BASE_URL}/auth/forgot-password`, {
+      method: 'POST',
+      body: { email }
     })
   }
 
@@ -45,27 +47,19 @@ export const useAuthApi = () => {
   }
 
   const updateProfile = async (token: string, firstName: string, lastName: string) => {
-    return $fetch(
-      `${API_BASE_URL}/users/profile?firstName=${firstName}&lastName=${lastName}`,
-      {
-        method: 'PUT',
-        headers: {
-          Authorization: `Bearer ${token}`
-        }
-      }
-    )
+    return $fetch(`${API_BASE_URL}/users/profile`, {
+      method: 'PUT',
+      headers: { Authorization: `Bearer ${token}` },
+      body: { firstName, lastName }
+    })
   }
 
   const changePassword = async (token: string, currentPassword: string, newPassword: string, confirmPassword: string) => {
-    return $fetch(
-      `${API_BASE_URL}/users/change-password?currentPassword=${currentPassword}&newPassword=${newPassword}&confirmPassword=${confirmPassword}`,
-      {
-        method: 'POST',
-        headers: {
-          Authorization: `Bearer ${token}`
-        }
-      }
-    )
+    return $fetch(`${API_BASE_URL}/users/change-password`, {
+      method: 'POST',
+      headers: { Authorization: `Bearer ${token}` },
+      body: { currentPassword, newPassword, confirmPassword }
+    })
   }
 
   return {

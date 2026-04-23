@@ -60,7 +60,8 @@ import type { PasswordResetRequest } from '~/types/auth'
 
 definePageMeta({
   middleware: 'auth',
-  layout: 'blank'
+  layout: 'blank',
+  authPage: true
 })
 
 const router = useRouter()
