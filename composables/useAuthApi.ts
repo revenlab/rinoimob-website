@@ -1,8 +1,9 @@
 import type { LoginRequest, RegisterRequest, PasswordResetRequest, LoginResponse } from '~/types/auth'
 
-const API_BASE_URL = '/api/v1'
-
 export const useAuthApi = () => {
+  const config = useRuntimeConfig()
+  const API_BASE_URL = `${config.public.apiUrl.replace(/\/$/, '')}/api/v1`
+
   const register = async (data: RegisterRequest) => {
     return $fetch(`${API_BASE_URL}/auth/register`, {
       method: 'POST',
