@@ -1,22 +1,32 @@
 <template>
   <div class="bg-[#F1F5F9] min-h-screen">
-    <!-- Search bar at top -->
-    <div class="bg-white border-b border-slate-200 py-4">
-      <div class="max-w-7xl mx-auto px-4 sm:px-6">
-        <div class="flex flex-col sm:flex-row gap-3 items-stretch sm:items-center">
+    <!-- Filter bar -->
+    <div class="bg-white border-b border-slate-200 py-4 sticky top-0 z-10 shadow-sm">
+      <div class="max-w-7xl mx-auto px-4 sm:px-6 space-y-3">
+        <!-- Operation pills -->
+        <div class="flex flex-wrap gap-2">
+          <button
+            v-for="op in operationOptions"
+            :key="op.value"
+            @click="setOperation(op.value)"
+            class="px-4 py-1.5 rounded-full text-sm font-semibold transition-all border"
+            :class="filters.operation === op.value
+              ? 'bg-[#2563EB] text-white border-[#2563EB]'
+              : 'bg-white text-slate-600 border-slate-200 hover:border-blue-300 hover:text-blue-600'"
+          >
+            {{ op.label }}
+          </button>
+        </div>
+
+        <!-- Secondary filters row -->
+        <div class="flex flex-col sm:flex-row gap-2 items-stretch sm:items-center">
           <input
-            v-model="searchText"
+            v-model="filters.city"
             type="text"
-            placeholder="Cidade, bairro ou endereço"
-            class="flex-1 px-4 py-2.5 text-sm text-slate-700 placeholder-slate-400 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500/30"
+            placeholder="Cidade"
+            @keyup.enter="applyFilters"
+            class="flex-1 min-w-0 px-4 py-2.5 text-sm text-slate-700 placeholder-slate-400 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500/30"
           />
-          <select v-model="filters.operation" @change="applyFilters"
-            class="px-3 py-2.5 text-sm border border-slate-200 rounded-xl bg-white text-slate-700 focus:outline-none focus:ring-2 focus:ring-blue-500/30">
-            <option value="">Todas as operações</option>
-            <option value="SALE">Venda</option>
-            <option value="RENT">Locação</option>
-            <option value="SEASONAL">Temporada</option>
-          </select>
           <select v-model="filters.propertyType" @change="applyFilters"
             class="px-3 py-2.5 text-sm border border-slate-200 rounded-xl bg-white text-slate-700 focus:outline-none focus:ring-2 focus:ring-blue-500/30">
             <option value="">Todos os tipos</option>
@@ -26,13 +36,20 @@
             <option value="COMMERCIAL">Comercial</option>
             <option value="RURAL">Rural</option>
           </select>
+          <select v-model="filters.maxPrice" @change="applyFilters"
+            class="px-3 py-2.5 text-sm border border-slate-200 rounded-xl bg-white text-slate-700 focus:outline-none focus:ring-2 focus:ring-blue-500/30">
+            <option value="">Sem limite</option>
+            <option value="500000">Até R$500k</option>
+            <option value="1000000">R$500k – 1M</option>
+            <option value="2000000">R$1M – 2M</option>
+          </select>
           <button @click="applyFilters"
-            class="px-6 py-2.5 text-sm font-semibold text-white rounded-xl bg-[#2563EB] hover:bg-blue-700 transition-colors">
+            class="px-6 py-2.5 text-sm font-semibold text-white rounded-xl bg-[#2563EB] hover:bg-blue-700 transition-colors shrink-0">
             Buscar
           </button>
-          <button @click="clearFilters"
-            class="px-3 py-2.5 text-xs font-medium text-slate-500 border border-slate-200 rounded-xl hover:bg-slate-50 transition-colors">
-            Limpar
+          <button v-if="hasActiveFilters" @click="clearFilters"
+            class="px-3 py-2.5 text-xs font-medium text-slate-500 border border-slate-200 rounded-xl hover:bg-slate-50 transition-colors shrink-0">
+            Limpar filtros
           </button>
         </div>
       </div>
@@ -126,13 +143,23 @@
       </div>
 
       <!-- Pagination -->
-      <div v-if="totalPages > 1" class="flex items-center justify-center gap-3 mt-10">
-        <button :disabled="currentPage === 0" @click="currentPage--; loadProperties()"
+      <div v-if="totalPages > 1" class="flex items-center justify-center gap-2 mt-10 flex-wrap">
+        <button :disabled="currentPage === 0" @click="goToPage(currentPage)"
           class="px-4 py-2 text-sm rounded-xl border border-slate-200 bg-white text-slate-600 disabled:opacity-40 hover:bg-slate-50 transition-colors">
           ← Anterior
         </button>
-        <span class="text-sm text-slate-500">Página {{ currentPage + 1 }} de {{ totalPages }}</span>
-        <button :disabled="currentPage + 1 >= totalPages" @click="currentPage++; loadProperties()"
+        <button
+          v-for="p in visiblePages"
+          :key="p"
+          @click="goToPage(p)"
+          class="w-9 h-9 text-sm rounded-xl border transition-colors"
+          :class="p === currentPage + 1
+            ? 'bg-[#2563EB] text-white border-[#2563EB] font-semibold'
+            : 'bg-white text-slate-600 border-slate-200 hover:bg-slate-50'"
+        >
+          {{ p }}
+        </button>
+        <button :disabled="currentPage + 1 >= totalPages" @click="goToPage(currentPage + 2)"
           class="px-4 py-2 text-sm rounded-xl border border-slate-200 bg-white text-slate-600 disabled:opacity-40 hover:bg-slate-50 transition-colors">
           Próxima →
         </button>
@@ -146,8 +173,16 @@ import type { PublicPropertySummary } from '~/types/property'
 
 definePageMeta({ layout: 'default' })
 
+useHead({
+  title: 'Imóveis | Rinoimob',
+  meta: [
+    { name: 'description', content: 'Encontre o imóvel ideal. Casas, apartamentos, terrenos e mais.' },
+  ],
+})
+
 const { listProperties } = usePublicApi()
 const route = useRoute()
+const router = useRouter()
 
 const getTenantSlug = () => {
   if (route.query.tenant) return String(route.query.tenant)
@@ -158,16 +193,38 @@ const getTenantSlug = () => {
   return 'demo'
 }
 
-const searchText = ref('')
+const operationOptions = [
+  { label: 'Todos', value: '' },
+  { label: 'Comprar', value: 'SALE' },
+  { label: 'Alugar', value: 'RENT' },
+  { label: 'Temporada', value: 'SEASONAL' },
+]
+
 const filters = ref({
   operation: (route.query.operation as string) || '',
   propertyType: (route.query.propertyType as string) || '',
+  city: (route.query.city as string) || '',
+  maxPrice: (route.query.maxPrice as string) || '',
 })
-const currentPage = ref(0)
+const currentPage = ref(Number(route.query.page) > 1 ? Number(route.query.page) - 1 : 0)
 const totalPages = ref(1)
 const totalElements = ref(0)
 const properties = ref<PublicPropertySummary[]>([])
 const pending = ref(true)
+
+const hasActiveFilters = computed(() =>
+  !!(filters.value.operation || filters.value.propertyType || filters.value.city || filters.value.maxPrice)
+)
+
+const visiblePages = computed(() => {
+  const total = totalPages.value
+  const current = currentPage.value + 1
+  if (total <= 5) return Array.from({ length: total }, (_, i) => i + 1)
+  let start = Math.max(1, current - 2)
+  const end = Math.min(total, start + 4)
+  if (end - start < 4) start = Math.max(1, end - 4)
+  return Array.from({ length: end - start + 1 }, (_, i) => start + i)
+})
 
 const operationLabel = (op: string) => ({ SALE: 'Venda', RENT: 'Aluguel', SEASONAL: 'Temporada' }[op] ?? op)
 const operationBg = (op: string) => ({
@@ -179,6 +236,16 @@ const operationBg = (op: string) => ({
 const formatPrice = (price: number, currency: string) =>
   new Intl.NumberFormat('pt-BR', { style: 'currency', currency: currency || 'BRL', maximumFractionDigits: 0 }).format(price)
 
+const syncUrl = () => {
+  const query: Record<string, string> = {}
+  if (filters.value.operation) query.operation = filters.value.operation
+  if (filters.value.propertyType) query.propertyType = filters.value.propertyType
+  if (filters.value.city) query.city = filters.value.city
+  if (filters.value.maxPrice) query.maxPrice = filters.value.maxPrice
+  if (currentPage.value > 0) query.page = String(currentPage.value + 1)
+  router.replace({ query })
+}
+
 const loadProperties = async () => {
   pending.value = true
   try {
@@ -188,6 +255,8 @@ const loadProperties = async () => {
       size: 12,
       operation: filters.value.operation || undefined,
       propertyType: filters.value.propertyType || undefined,
+      city: filters.value.city || undefined,
+      maxPrice: filters.value.maxPrice || undefined,
     })
     properties.value = data.content
     totalPages.value = data.totalPages
@@ -199,8 +268,27 @@ const loadProperties = async () => {
   }
 }
 
-const applyFilters = () => { currentPage.value = 0; loadProperties() }
-const clearFilters = () => { filters.value = { operation: '', propertyType: '' }; searchText.value = ''; applyFilters() }
+const setOperation = (value: string) => {
+  filters.value.operation = value
+  applyFilters()
+}
+
+const applyFilters = () => {
+  currentPage.value = 0
+  syncUrl()
+  loadProperties()
+}
+
+const goToPage = (page: number) => {
+  currentPage.value = page - 1
+  syncUrl()
+  loadProperties()
+}
+
+const clearFilters = () => {
+  filters.value = { operation: '', propertyType: '', city: '', maxPrice: '' }
+  applyFilters()
+}
 
 onMounted(loadProperties)
 </script>

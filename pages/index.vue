@@ -190,7 +190,7 @@ const doSearch = () => {
   router.push({
     path: '/imoveis',
     query: {
-      ...(searchQuery.value ? { q: searchQuery.value } : {}),
+      ...(searchQuery.value ? { city: searchQuery.value } : {}),
       ...(searchType.value ? { propertyType: searchType.value } : {}),
       operation: activeTab.value,
     },

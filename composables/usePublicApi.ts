@@ -10,13 +10,15 @@ export const usePublicApi = () => {
 
   const listProperties = async (
     tenantSlug: string,
-    params: { page?: number; size?: number; operation?: string; propertyType?: string } = {}
+    params: { page?: number; size?: number; operation?: string; propertyType?: string; maxPrice?: string | number; city?: string } = {}
   ): Promise<PageResponse<PublicPropertySummary>> => {
     const query = new URLSearchParams()
     if (params.page != null) query.set('page', String(params.page))
     if (params.size != null) query.set('size', String(params.size))
     if (params.operation) query.set('operation', params.operation)
     if (params.propertyType) query.set('propertyType', params.propertyType)
+    if (params.maxPrice) query.set('maxPrice', String(params.maxPrice))
+    if (params.city) query.set('city', params.city)
     const qs = query.toString()
     return $fetch(`${API_BASE}/properties${qs ? `?${qs}` : ''}`, {
       headers: getHeaders(tenantSlug),

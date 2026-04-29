@@ -270,6 +270,17 @@ const property = ref<PublicPropertyDetail | null>(null)
 const activePhoto = ref<PublicPhoto | null>(null)
 const pending = ref(true)
 
+useHead(computed(() => ({
+  title: property.value ? `${property.value.title} | Rinoimob` : 'Imóvel | Rinoimob',
+  meta: [
+    { name: 'description', content: property.value?.description?.slice(0, 160) ?? '' },
+    { property: 'og:title', content: property.value?.title ?? '' },
+    { property: 'og:description', content: property.value?.description?.slice(0, 160) ?? '' },
+    { property: 'og:image', content: property.value?.photos?.[0]?.url ?? property.value?.coverPhotoUrl ?? '' },
+    { property: 'og:type', content: 'website' },
+  ],
+})))
+
 const operationLabel = (op: string) => ({ SALE: 'Venda', RENT: 'Aluguel', SEASONAL: 'Temporada' }[op] ?? op)
 const operationBg = (op: string) => ({
   SALE: 'bg-[#2563EB]',
