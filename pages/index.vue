@@ -1,13 +1,13 @@
 <template>
   <div>
     <!-- Hero -->
-    <section style="background-color: #1e2d4d" class="relative overflow-hidden">
+    <section class="relative overflow-hidden" :style="{ backgroundColor: cfg.primaryColor }">
       <div class="relative max-w-4xl mx-auto px-4 sm:px-6 py-24 text-center">
         <h1 class="text-4xl md:text-5xl font-bold text-white mb-4 leading-tight">
-          Encontre seu imóvel ideal
+          {{ cfg.heroTitle || 'Encontre o imóvel dos seus sonhos' }}
         </h1>
         <p class="text-slate-300 text-lg mb-10">
-          Compre, alugue ou anuncie com facilidade. Milhares de imóveis esperando por você.
+          {{ cfg.heroSubtitle || 'Venda, aluguel e temporada' }}
         </p>
 
         <!-- Tabs -->
@@ -17,7 +17,8 @@
             :key="tab.value"
             @click="activeTab = tab.value"
             class="px-6 py-2.5 rounded-full text-sm font-semibold transition-all"
-            :class="activeTab === tab.value ? 'bg-[#2563EB] text-white' : 'bg-white/15 text-white hover:bg-white/25'"
+            :class="activeTab === tab.value ? 'text-white' : 'bg-white/15 text-white hover:bg-white/25'"
+            :style="activeTab === tab.value ? { backgroundColor: cfg.secondaryColor } : undefined"
           >
             {{ tab.label }}
           </button>
@@ -44,7 +45,8 @@
           </select>
           <button
             @click="doSearch"
-            class="px-8 py-3 text-white font-semibold rounded-xl transition-colors bg-[#2563EB] hover:bg-blue-700"
+            class="px-8 py-3 text-white font-semibold rounded-xl transition-colors"
+            :style="{ backgroundColor: cfg.secondaryColor }"
           >
             Buscar
           </button>
@@ -56,16 +58,16 @@
     <section class="max-w-7xl mx-auto px-4 sm:px-6 py-16">
       <div class="flex items-center justify-between mb-8">
         <div>
-          <h2 class="text-2xl font-bold text-[#1e2d4d]">Imóveis em Destaque</h2>
+          <h2 class="text-2xl font-bold" :style="{ color: cfg.primaryColor }">Imóveis em Destaque</h2>
           <p class="text-slate-500 text-sm mt-1">Selecionados para você</p>
         </div>
-        <NuxtLink to="/imoveis" class="text-sm font-semibold text-[#2563EB] hover:opacity-80 transition-opacity">
+        <NuxtLink to="/imoveis" class="text-sm font-semibold hover:opacity-80 transition-opacity" :style="{ color: cfg.secondaryColor }">
           Ver todos →
         </NuxtLink>
       </div>
 
       <div v-if="pending" class="flex justify-center py-16">
-        <svg class="animate-spin h-8 w-8 text-[#2563EB]" fill="none" viewBox="0 0 24 24">
+        <svg class="animate-spin h-8 w-8" :style="{ color: cfg.secondaryColor }" fill="none" viewBox="0 0 24 24">
           <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4" />
           <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
         </svg>
@@ -131,9 +133,9 @@
     </section>
 
     <!-- Features -->
-    <section id="sobre" style="background-color: #1e2d4d" class="py-16">
+    <section id="sobre" class="py-16" :style="{ backgroundColor: cfg.primaryColor }">
       <div class="max-w-7xl mx-auto px-4 sm:px-6">
-        <h2 class="text-2xl font-bold text-white text-center mb-12">Por que escolher a Rinoimob?</h2>
+        <h2 class="text-2xl font-bold text-white text-center mb-12">Por que escolher a {{ cfg.companyName }}?</h2>
         <div class="grid grid-cols-1 md:grid-cols-3 gap-8 text-center">
           <div>
             <div class="w-14 h-14 rounded-2xl bg-white/10 flex items-center justify-center mx-auto mb-4">
@@ -170,15 +172,18 @@
 
 <script setup lang="ts">
 import type { PublicPropertySummary } from '~/types/property'
+import { DEFAULT_TENANT_CONFIG } from '~/types/tenant'
 
 definePageMeta({ layout: 'default' })
 
 const router = useRouter()
-const route = useRoute()
-
 const activeTab = ref('SALE')
 const searchQuery = ref('')
 const searchType = ref('')
+
+const { useTenantConfigData, resolveSlug } = useTenantConfig()
+const { data: tenantConfig } = await useTenantConfigData()
+const cfg = computed(() => ({ ...DEFAULT_TENANT_CONFIG, ...(tenantConfig.value ?? {}) }))
 
 const tabs = [
   { label: 'Comprar', value: 'SALE' },
@@ -197,22 +202,13 @@ const doSearch = () => {
   })
 }
 
-const getTenantSlug = () => {
-  if (route.query.tenant) return String(route.query.tenant)
-  if (typeof window !== 'undefined') {
-    const parts = window.location.hostname.split('.')
-    if (parts.length >= 3) return parts[0]
-  }
-  return 'demo'
-}
-
 const { listProperties } = usePublicApi()
 const featuredProperties = ref<PublicPropertySummary[]>([])
 const pending = ref(true)
 
 const operationLabel = (op: string) => ({ SALE: 'Venda', RENT: 'Aluguel', SEASONAL: 'Temporada' }[op] ?? op)
 const operationBg = (op: string) => ({
-  SALE: 'bg-[#2563EB]',
+  SALE: 'bg-blue-600',
   RENT: 'bg-emerald-600',
   SEASONAL: 'bg-amber-500',
 }[op] ?? 'bg-slate-600')
@@ -222,8 +218,7 @@ const formatPrice = (price: number, currency: string) =>
 
 onMounted(async () => {
   try {
-    const slug = getTenantSlug()
-    const data = await listProperties(slug, { page: 0, size: 8 })
+    const data = await listProperties(resolveSlug(), { page: 0, size: 8 })
     featuredProperties.value = data.content
   } catch {
     featuredProperties.value = []
