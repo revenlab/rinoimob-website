@@ -10,8 +10,11 @@
             :key="op.value"
             @click="setOperation(op.value)"
             class="px-4 py-1.5 rounded-full text-sm font-semibold transition-all border"
+            :style="filters.operation === op.value
+              ? { backgroundColor: cfg.primaryColor, borderColor: cfg.primaryColor, color: '#fff' }
+              : {}"
             :class="filters.operation === op.value
-              ? 'bg-[#2563EB] text-white border-[#2563EB]'
+              ? ''
               : 'bg-white text-slate-600 border-slate-200 hover:border-blue-300 hover:text-blue-600'"
           >
             {{ op.label }}
@@ -44,7 +47,8 @@
             <option value="2000000">R$1M – 2M</option>
           </select>
           <button @click="applyFilters"
-            class="px-6 py-2.5 text-sm font-semibold text-white rounded-xl bg-[#2563EB] hover:bg-blue-700 transition-colors shrink-0">
+            class="px-6 py-2.5 text-sm font-semibold text-white rounded-xl transition-colors shrink-0"
+            :style="{ backgroundColor: cfg.primaryColor }">
             Buscar
           </button>
           <button v-if="hasActiveFilters" @click="clearFilters"
@@ -57,7 +61,7 @@
 
     <div class="max-w-7xl mx-auto px-4 sm:px-6 py-8">
       <div class="mb-6">
-        <h1 class="text-2xl font-bold text-[#1e2d4d]">Imóveis disponíveis</h1>
+        <h1 class="text-2xl font-bold" :style="{ color: cfg.primaryColor }">Imóveis disponíveis</h1>
         <p class="text-slate-500 text-sm mt-1">
           {{ pending ? 'Carregando...' : `${totalElements} imóvel${totalElements !== 1 ? 'is' : ''} encontrado${totalElements !== 1 ? 's' : ''}` }}
         </p>
@@ -82,64 +86,11 @@
 
       <!-- Grid -->
       <div v-else class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-        <NuxtLink
+        <PropertyCard
           v-for="property in properties"
           :key="property.id"
-          :to="`/imoveis/${property.id}`"
-          class="group relative rounded-2xl overflow-hidden block"
-          style="aspect-ratio: 4/3;"
-        >
-          <!-- Photo -->
-          <img
-            v-if="property.coverPhotoUrl"
-            :src="property.coverPhotoUrl"
-            :alt="property.title"
-            class="absolute inset-0 w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
-          />
-          <div v-else class="absolute inset-0 bg-slate-200 flex items-center justify-center">
-            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-12 h-12 text-slate-400">
-              <path stroke-linecap="round" stroke-linejoin="round" d="M2.25 15.75l5.159-5.159a2.25 2.25 0 013.182 0l5.159 5.159m-1.5-1.5l1.409-1.409a2.25 2.25 0 013.182 0l2.909 2.909m-18 3.75h16.5a1.5 1.5 0 001.5-1.5V6a1.5 1.5 0 00-1.5-1.5H3.75A1.5 1.5 0 002.25 6v12a1.5 1.5 0 001.5 1.5zm10.5-11.25h.008v.008h-.008V8.25zm.375 0a.375.375 0 11-.75 0 .375.375 0 01.75 0z" />
-            </svg>
-          </div>
-
-          <!-- Gradient overlay -->
-          <div class="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent"></div>
-
-          <!-- Operation badge top-left -->
-          <span
-            class="absolute top-3 left-3 px-2.5 py-1 text-xs font-bold rounded-full text-white"
-            :class="operationBg(property.operation)"
-          >
-            {{ operationLabel(property.operation) }}
-          </span>
-
-          <!-- Heart button top-right -->
-          <button class="absolute top-3 right-3 bg-white/90 rounded-full p-2 shadow hover:bg-white transition-colors" @click.prevent>
-            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-4 h-4 text-slate-500">
-              <path stroke-linecap="round" stroke-linejoin="round" d="M21 8.25c0-2.485-2.099-4.5-4.688-4.5-1.935 0-3.597 1.126-4.312 2.733-.715-1.607-2.377-2.733-4.313-2.733C5.1 3.75 3 5.765 3 8.25c0 7.22 9 12 9 12s9-4.78 9-12z" />
-            </svg>
-          </button>
-
-          <!-- Text at bottom-left -->
-          <div class="absolute bottom-0 left-0 right-0 p-4">
-            <p v-if="property.price" class="text-white font-bold text-base">
-              {{ formatPrice(property.price, property.currency) }}
-              <span v-if="property.operation === 'RENT'" class="text-xs font-normal text-slate-300">/mês</span>
-            </p>
-            <p v-else class="text-slate-300 text-sm">Consulte o preço</p>
-            <p class="text-slate-200 text-sm line-clamp-1 mt-0.5">{{ property.title }}</p>
-            <p v-if="property.addressCity" class="text-slate-400 text-xs">
-              {{ property.addressCity }}{{ property.addressState ? `, ${property.addressState}` : '' }}
-            </p>
-          </div>
-
-          <!-- Ver Detalhes hover -->
-          <div class="absolute bottom-4 left-0 right-0 flex justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-200">
-            <span class="bg-white text-slate-800 text-xs font-semibold px-4 py-2 rounded-full shadow-lg">
-              Ver Detalhes
-            </span>
-          </div>
-        </NuxtLink>
+          :property="property"
+        />
       </div>
 
       <!-- Pagination -->
@@ -153,9 +104,8 @@
           :key="p"
           @click="goToPage(p)"
           class="w-9 h-9 text-sm rounded-xl border transition-colors"
-          :class="p === currentPage + 1
-            ? 'bg-[#2563EB] text-white border-[#2563EB] font-semibold'
-            : 'bg-white text-slate-600 border-slate-200 hover:bg-slate-50'"
+          :style="p === currentPage + 1 ? { backgroundColor: cfg.primaryColor, borderColor: cfg.primaryColor, color: '#fff' } : {}"
+          :class="p === currentPage + 1 ? 'font-semibold' : 'bg-white text-slate-600 border-slate-200 hover:bg-slate-50'"
         >
           {{ p }}
         </button>
@@ -170,6 +120,7 @@
 
 <script setup lang="ts">
 import type { PublicPropertySummary } from '~/types/property'
+import { DEFAULT_TENANT_CONFIG } from '~/types/tenant'
 
 definePageMeta({ layout: 'default' })
 
@@ -181,17 +132,11 @@ useHead({
 })
 
 const { listProperties } = usePublicApi()
+const { resolveSlug, useTenantConfigData } = useTenantConfig()
+const { data: tenantConfig } = await useTenantConfigData()
+const cfg = computed(() => ({ ...DEFAULT_TENANT_CONFIG, ...(tenantConfig.value ?? {}) }))
 const route = useRoute()
 const router = useRouter()
-
-const getTenantSlug = () => {
-  if (route.query.tenant) return String(route.query.tenant)
-  if (typeof window !== 'undefined') {
-    const parts = window.location.hostname.split('.')
-    if (parts.length >= 3) return parts[0]
-  }
-  return 'demo'
-}
 
 const operationOptions = [
   { label: 'Todos', value: '' },
@@ -226,15 +171,6 @@ const visiblePages = computed(() => {
   return Array.from({ length: end - start + 1 }, (_, i) => start + i)
 })
 
-const operationLabel = (op: string) => ({ SALE: 'Venda', RENT: 'Aluguel', SEASONAL: 'Temporada' }[op] ?? op)
-const operationBg = (op: string) => ({
-  SALE: 'bg-[#2563EB]',
-  RENT: 'bg-emerald-600',
-  SEASONAL: 'bg-amber-500',
-}[op] ?? 'bg-slate-600')
-
-const formatPrice = (price: number, currency: string) =>
-  new Intl.NumberFormat('pt-BR', { style: 'currency', currency: currency || 'BRL', maximumFractionDigits: 0 }).format(price)
 
 const syncUrl = () => {
   const query: Record<string, string> = {}
@@ -249,8 +185,7 @@ const syncUrl = () => {
 const loadProperties = async () => {
   pending.value = true
   try {
-    const slug = getTenantSlug()
-    const data = await listProperties(slug, {
+    const data = await listProperties(resolveSlug(), {
       page: currentPage.value,
       size: 12,
       operation: filters.value.operation || undefined,

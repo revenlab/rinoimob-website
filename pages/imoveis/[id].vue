@@ -68,7 +68,7 @@
 
             <!-- Price -->
             <div class="bg-white rounded-2xl p-5 shadow-sm">
-              <p v-if="property.price" class="text-3xl font-bold text-[#2563EB]">
+              <p v-if="property.price" class="text-3xl font-bold" :style="{ color: cfg.primaryColor }">
                 {{ formatPrice(property.price, property.currency) }}
                 <span v-if="property.operation === 'RENT'" class="text-base font-normal text-slate-400">/mês</span>
               </p>
@@ -214,7 +214,8 @@
                 <button
                   type="submit"
                   :disabled="leadSubmitting"
-                  class="w-full py-3 text-sm font-semibold text-white rounded-xl transition-colors disabled:opacity-60 bg-[#2563EB] hover:bg-blue-700"
+                  class="w-full py-3 text-sm font-semibold text-white rounded-xl transition-opacity disabled:opacity-60"
+                  :style="{ backgroundColor: cfg.primaryColor }"
                 >
                   {{ leadSubmitting ? 'Enviando...' : 'Enviar mensagem' }}
                 </button>
@@ -231,7 +232,10 @@
                   </svg>
                   Falar no WhatsApp
                 </a>
-                <button class="w-full py-3 text-sm font-semibold text-[#2563EB] rounded-xl border border-[#2563EB] hover:bg-blue-50 transition-colors">
+                <button
+                  class="w-full py-3 text-sm font-semibold rounded-xl border transition-colors hover:bg-blue-50"
+                  :style="{ color: cfg.primaryColor, borderColor: cfg.primaryColor }"
+                >
                   Simular Pagamento
                 </button>
               </div>
@@ -251,20 +255,15 @@
 
 <script setup lang="ts">
 import type { PublicPropertyDetail, PublicPhoto } from '~/types/property'
+import { DEFAULT_TENANT_CONFIG } from '~/types/tenant'
 
 definePageMeta({ layout: 'default' })
 
 const route = useRoute()
 const { getProperty, createLead } = usePublicApi()
-
-const getTenantSlug = () => {
-  if (route.query.tenant) return String(route.query.tenant)
-  if (typeof window !== 'undefined') {
-    const parts = window.location.hostname.split('.')
-    if (parts.length >= 3) return parts[0]
-  }
-  return 'demo'
-}
+const { resolveSlug, useTenantConfigData } = useTenantConfig()
+const { data: tenantConfig } = await useTenantConfigData()
+const cfg = computed(() => ({ ...DEFAULT_TENANT_CONFIG, ...(tenantConfig.value ?? {}) }))
 
 const property = ref<PublicPropertyDetail | null>(null)
 const activePhoto = ref<PublicPhoto | null>(null)
@@ -321,8 +320,7 @@ const submitLead = async () => {
   leadSuccess.value = false
   leadError.value = false
   try {
-    const slug = getTenantSlug()
-    await createLead(slug, {
+    await createLead(resolveSlug(), {
       name: leadForm.value.name,
       email: leadForm.value.email || undefined,
       phone: leadForm.value.phone || undefined,
@@ -341,8 +339,7 @@ const submitLead = async () => {
 onMounted(async () => {
   try {
     const id = route.params.id as string
-    const slug = getTenantSlug()
-    const data = await getProperty(slug, id)
+    const data = await getProperty(resolveSlug(), id)
     property.value = data
     if (data.photos && data.photos.length > 0) {
       const coverPhoto = data.photos.find((p) => p.isCover) ?? data.photos[0]
