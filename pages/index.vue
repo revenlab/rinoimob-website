@@ -4,7 +4,12 @@
     <!-- ============================================
          HERO
     ============================================= -->
-    <section class="bg-gradient-to-br from-white via-slate-50 to-blue-50/40 overflow-hidden">
+    <section
+      ref="heroRef"
+      class="bg-gradient-to-br from-white via-slate-50 to-blue-50/40 overflow-x-hidden"
+      @mousemove="onHeroMouseMove"
+      @mouseleave="resetMouse"
+    >
       <div class="max-w-7xl mx-auto px-4 sm:px-6 py-16 lg:py-24">
         <div class="grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-16 items-center">
 
@@ -64,24 +69,42 @@
           </div>
 
           <!-- Right: Illustration card -->
-          <div class="order-1 lg:order-2 relative">
-            <div class="rounded-3xl overflow-hidden shadow-2xl relative" style="aspect-ratio: 4/3;">
-              <div
-                class="w-full h-full flex flex-col items-center justify-center"
-                :style="{ background: `linear-gradient(135deg, ${cfg.primaryColor}22 0%, ${cfg.primaryColor}44 100%)` }"
+          <div class="order-1 lg:order-2 relative" style="perspective: 1200px;">
+            <div
+              class="rounded-3xl overflow-hidden shadow-2xl relative"
+              :style="[{ 'aspect-ratio': '4/3' }, heroCardStyle]"
+            >
+              <!-- Hero background image (when configured) -->
+              <img
+               v-if="cfg.heroImageUrl"
+               :src="cfg.heroImageUrl"
+               alt="Banner"
+               class="absolute inset-0 w-full h-full object-cover"
               >
-                <div class="w-24 h-24 rounded-3xl flex items-center justify-center mb-4 shadow-lg" :style="{ backgroundColor: cfg.primaryColor }">
-                  <svg class="w-12 h-12 text-white" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
-                    <path stroke-linecap="round" stroke-linejoin="round" d="M2.25 12l8.954-8.955c.44-.439 1.152-.439 1.591 0L21.75 12M4.5 9.75v10.125c0 .621.504 1.125 1.125 1.125H9.75v-4.875c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125V21h4.125c.621 0 1.125-.504 1.125-1.125V9.75M8.25 21h8.25" />
-                  </svg>
-                </div>
-                <p class="font-bold text-slate-700 text-xl">{{ cfg.companyName }}</p>
-                <p class="text-slate-500 text-sm mt-1">Seu próximo imóvel está aqui</p>
+              <!-- Background gradient: solid when no image, overlay when image exists -->
+              <div
+               class="absolute inset-0"
+               :style="cfg.heroImageUrl
+                 ? { background: 'linear-gradient(to top, rgba(0,0,0,0.55) 0%, rgba(0,0,0,0.05) 60%)' }
+                 : { background: `linear-gradient(135deg, ${cfg.primaryColor}22 0%, ${cfg.primaryColor}44 100%)` }"
+              ></div>
+              <!-- Content overlay -->
+              <div class="relative w-full h-full flex flex-col items-center justify-center">
+               <div class="w-24 h-24 rounded-3xl flex items-center justify-center mb-4 shadow-lg" :style="{ backgroundColor: cfg.heroImageUrl ? 'rgba(255,255,255,0.15)' : cfg.primaryColor }">
+                 <svg class="w-12 h-12 text-white" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+                   <path stroke-linecap="round" stroke-linejoin="round" d="M2.25 12l8.954-8.955c.44-.439 1.152-.439 1.591 0L21.75 12M4.5 9.75v10.125c0 .621.504 1.125 1.125 1.125H9.75v-4.875c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125V21h4.125c.621 0 1.125-.504 1.125-1.125V9.75M8.25 21h8.25" />
+                 </svg>
+               </div>
+               <p class="font-bold text-xl" :class="cfg.heroImageUrl ? 'text-white' : 'text-slate-700'">{{ cfg.companyName }}</p>
+               <p class="text-sm mt-1" :class="cfg.heroImageUrl ? 'text-white/80' : 'text-slate-500'">Seu próximo imóvel está aqui</p>
               </div>
             </div>
 
             <!-- Floating stats badge -->
-            <div class="absolute bottom-6 left-6 bg-white rounded-2xl px-4 py-3 shadow-xl flex items-center gap-3">
+            <div
+              class="absolute bottom-6 left-6 bg-white rounded-2xl px-4 py-3 shadow-xl flex items-center gap-3"
+              :style="badge1Style"
+            >
               <div class="w-10 h-10 rounded-xl flex items-center justify-center text-xl" :style="{ backgroundColor: cfg.primaryColor + '18' }">
                 ⭐
               </div>
@@ -92,7 +115,10 @@
             </div>
 
             <!-- Second floating badge -->
-            <div class="absolute top-6 right-6 bg-white rounded-2xl px-4 py-3 shadow-xl">
+            <div
+              class="absolute top-6 right-6 bg-white rounded-2xl px-4 py-3 shadow-xl"
+              :style="badge2Style"
+            >
               <p class="font-bold text-slate-900 text-sm">2.500+</p>
               <p class="text-slate-400 text-xs">Imóveis listados</p>
             </div>
@@ -111,17 +137,43 @@
           <h2 class="text-2xl font-bold text-slate-900">Imóveis em Destaque</h2>
           <p class="text-slate-500 text-sm mt-1">As melhores oportunidades selecionadas por nossa equipe especializada para você.</p>
         </div>
-        <div class="flex items-center gap-2 flex-shrink-0 bg-slate-100 p-1 rounded-full">
-          <button
-            v-for="tab in featuredTabs"
-            :key="tab.value"
-            @click="activeFeaturedTab = tab.value; loadFeatured()"
-            class="px-4 py-1.5 rounded-full text-sm font-medium transition-all"
-            :class="activeFeaturedTab === tab.value ? 'text-white shadow-sm' : 'text-slate-600 hover:text-slate-900'"
-            :style="activeFeaturedTab === tab.value ? { backgroundColor: cfg.primaryColor } : undefined"
-          >
-            {{ tab.label }}
-          </button>
+        <div class="flex items-center gap-3 flex-shrink-0">
+          <!-- Nav arrows -->
+          <div class="flex items-center gap-1">
+            <button
+              @click="prevFeatured"
+              :disabled="featuredPage === 0"
+              class="w-9 h-9 rounded-full border border-slate-200 bg-white flex items-center justify-center text-slate-500 hover:bg-slate-100 disabled:opacity-30 transition-all shadow-sm"
+              aria-label="Anterior"
+            >
+              <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 19.5L8.25 12l7.5-7.5" />
+              </svg>
+            </button>
+            <button
+              @click="nextFeatured"
+              :disabled="featuredPage >= featuredTotalPages - 1"
+              class="w-9 h-9 rounded-full border border-slate-200 bg-white flex items-center justify-center text-slate-500 hover:bg-slate-100 disabled:opacity-30 transition-all shadow-sm"
+              aria-label="Próximo"
+            >
+              <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M8.25 4.5l7.5 7.5-7.5 7.5" />
+              </svg>
+            </button>
+          </div>
+          <!-- Tabs -->
+          <div class="flex items-center gap-2 bg-slate-100 p-1 rounded-full">
+            <button
+              v-for="tab in featuredTabs"
+              :key="tab.value"
+              @click="activeFeaturedTab = tab.value; loadFeatured()"
+              class="px-4 py-1.5 rounded-full text-sm font-medium transition-all"
+              :class="activeFeaturedTab === tab.value ? 'text-white shadow-sm' : 'text-slate-600 hover:text-slate-900'"
+              :style="activeFeaturedTab === tab.value ? { backgroundColor: cfg.primaryColor } : undefined"
+            >
+              {{ tab.label }}
+            </button>
+          </div>
         </div>
       </div>
 
@@ -129,13 +181,40 @@
         <div class="w-8 h-8 rounded-full border-2 border-t-transparent animate-spin" :style="{ borderColor: cfg.primaryColor + '40', borderTopColor: 'transparent' }"></div>
       </div>
 
-      <div v-else-if="featuredProperties.length" class="grid grid-cols-2 lg:grid-cols-4 gap-4 lg:gap-5">
-        <PropertyCard
-          v-for="p in featuredProperties"
-          :key="p.id"
-          :property="p"
-        />
-      </div>
+      <template v-else-if="featuredProperties.length">
+        <!-- Carousel track -->
+        <div class="overflow-hidden">
+          <div
+            class="flex transition-transform duration-500 ease-in-out"
+            :style="{ transform: `translateX(-${featuredPage * 100}%)` }"
+          >
+            <div
+              v-for="(page, pageIdx) in featuredPages"
+              :key="pageIdx"
+              class="grid grid-cols-2 lg:grid-cols-4 gap-4 lg:gap-5 w-full flex-shrink-0"
+            >
+              <PropertyCard
+                v-for="p in page"
+                :key="p.id"
+                :property="p"
+              />
+            </div>
+          </div>
+        </div>
+
+        <!-- Dots pagination -->
+        <div class="flex justify-center items-center gap-2 mt-6">
+          <button
+            v-for="(_, i) in featuredTotalPages"
+            :key="i"
+            @click="featuredPage = i"
+            class="h-2 rounded-full transition-all duration-300"
+            :class="i === featuredPage ? 'w-6' : 'w-2 bg-slate-200 hover:bg-slate-300'"
+            :style="i === featuredPage ? { backgroundColor: cfg.primaryColor, width: '1.5rem' } : undefined"
+            :aria-label="`Página ${i + 1}`"
+          ></button>
+        </div>
+      </template>
 
       <div v-else class="text-center py-16 text-slate-400">
         <p>Nenhum imóvel disponível no momento.</p>
@@ -167,7 +246,9 @@
           </div>
           <div class="flex items-center gap-2">
             <button
-              class="w-9 h-9 rounded-full border border-slate-200 bg-white flex items-center justify-center text-slate-500 hover:bg-slate-100 transition-colors shadow-sm"
+              @click="prevLaunches"
+              :disabled="launchesPage === 0"
+              class="w-9 h-9 rounded-full border border-slate-200 bg-white flex items-center justify-center text-slate-500 hover:bg-slate-100 disabled:opacity-30 transition-all shadow-sm"
               aria-label="Anterior"
             >
               <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
@@ -175,7 +256,9 @@
               </svg>
             </button>
             <button
-              class="w-9 h-9 rounded-full border border-slate-200 bg-white flex items-center justify-center text-slate-500 hover:bg-slate-100 transition-colors shadow-sm"
+              @click="nextLaunches"
+              :disabled="launchesPage >= launchesTotalPages - 1"
+              class="w-9 h-9 rounded-full border border-slate-200 bg-white flex items-center justify-center text-slate-500 hover:bg-slate-100 disabled:opacity-30 transition-all shadow-sm"
               aria-label="Próximo"
             >
               <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
@@ -189,13 +272,40 @@
           <div class="w-8 h-8 rounded-full border-2 border-t-transparent animate-spin" :style="{ borderColor: cfg.primaryColor + '40', borderTopColor: 'transparent' }"></div>
         </div>
 
-        <div v-else-if="launches.length" class="grid grid-cols-2 lg:grid-cols-4 gap-4 lg:gap-5">
-          <PropertyCard
-            v-for="p in launches"
-            :key="p.id"
-            :property="p"
-          />
-        </div>
+        <template v-else-if="launches.length">
+          <!-- Carousel track -->
+          <div class="overflow-hidden">
+            <div
+              class="flex transition-transform duration-500 ease-in-out"
+              :style="{ transform: `translateX(-${launchesPage * 100}%)` }"
+            >
+              <div
+                v-for="(page, pageIdx) in launchesPages"
+                :key="pageIdx"
+                class="grid grid-cols-2 lg:grid-cols-4 gap-4 lg:gap-5 w-full flex-shrink-0"
+              >
+                <PropertyCard
+                  v-for="p in page"
+                  :key="p.id"
+                  :property="p"
+                />
+              </div>
+            </div>
+          </div>
+
+          <!-- Dots pagination -->
+          <div class="flex justify-center items-center gap-2 mt-6">
+            <button
+              v-for="(_, i) in launchesTotalPages"
+              :key="i"
+              @click="launchesPage = i"
+              class="h-2 rounded-full transition-all duration-300"
+              :class="i === launchesPage ? 'w-6' : 'w-2 bg-slate-200 hover:bg-slate-300'"
+              :style="i === launchesPage ? { backgroundColor: cfg.primaryColor, width: '1.5rem' } : undefined"
+              :aria-label="`Página ${i + 1}`"
+            ></button>
+          </div>
+        </template>
 
         <div v-else class="text-center py-12 text-slate-400">
           <p>Nenhum lançamento disponível no momento.</p>
@@ -417,14 +527,77 @@ import { DEFAULT_TENANT_CONFIG } from '~/types/tenant'
 
 definePageMeta({ layout: 'default' })
 
+// ── Hero parallax ──────────────────────────────────────────────────────────
+const heroRef = ref<HTMLElement | null>(null)
+const mouseX = ref(0) // -1 to 1
+const mouseY = ref(0) // -1 to 1
+
+const onHeroMouseMove = (e: MouseEvent) => {
+  if (!heroRef.value) return
+  const rect = heroRef.value.getBoundingClientRect()
+  mouseX.value = ((e.clientX - rect.left) / rect.width - 0.5) * 2
+  mouseY.value = ((e.clientY - rect.top) / rect.height - 0.5) * 2
+}
+const resetMouse = () => {
+  mouseX.value = 0
+  mouseY.value = 0
+}
+
+// Layer 0 — main card: subtle 3D tilt following cursor
+const heroCardStyle = computed(() => ({
+  transform: `perspective(800px) rotateX(${-mouseY.value * 5}deg) rotateY(${mouseX.value * 7}deg) translateZ(0)`,
+  transition: 'transform 0.18s ease-out',
+  willChange: 'transform',
+}))
+
+// Layer 1 — badge bottom-left: drifts opposite to cursor (pushes away)
+const badge1Style = computed(() => ({
+  transform: `translate(${mouseX.value * -16}px, ${mouseY.value * -10}px)`,
+  transition: 'transform 0.25s ease-out',
+  willChange: 'transform',
+}))
+
+// Layer 2 — badge top-right: drifts with cursor, different axis speed
+const badge2Style = computed(() => ({
+  transform: `translate(${mouseX.value * 20}px, ${mouseY.value * -14}px)`,
+  transition: 'transform 0.3s ease-out',
+  willChange: 'transform',
+}))
+// ──────────────────────────────────────────────────────────────────────────
+
 const router = useRouter()
 const searchQuery = ref('')
 const searchType = ref('')
 const activeFeaturedTab = ref<'SALE' | 'RENT' | 'SEASONAL'>('SALE')
 const featuredProperties = ref<PublicPropertySummary[]>([])
 const featuredPending = ref(true)
+const featuredPage = ref(0)
+const featuredItemsPerPage = 4
+const featuredPages = computed(() => {
+  const result: PublicPropertySummary[][] = []
+  for (let i = 0; i < featuredProperties.value.length; i += featuredItemsPerPage) {
+    result.push(featuredProperties.value.slice(i, i + featuredItemsPerPage))
+  }
+  return result
+})
+const featuredTotalPages = computed(() => Math.max(1, Math.ceil(featuredProperties.value.length / featuredItemsPerPage)))
+const prevFeatured = () => { if (featuredPage.value > 0) featuredPage.value-- }
+const nextFeatured = () => { if (featuredPage.value < featuredTotalPages.value - 1) featuredPage.value++ }
+
 const launches = ref<PublicPropertySummary[]>([])
 const launchesPending = ref(true)
+const launchesPage = ref(0)
+const launchesItemsPerPage = 4
+const launchesPages = computed(() => {
+  const result: PublicPropertySummary[][] = []
+  for (let i = 0; i < launches.value.length; i += launchesItemsPerPage) {
+    result.push(launches.value.slice(i, i + launchesItemsPerPage))
+  }
+  return result
+})
+const launchesTotalPages = computed(() => Math.max(1, Math.ceil(launches.value.length / launchesItemsPerPage)))
+const prevLaunches = () => { if (launchesPage.value > 0) launchesPage.value-- }
+const nextLaunches = () => { if (launchesPage.value < launchesTotalPages.value - 1) launchesPage.value++ }
 
 const leadForm = ref<{ name: string; email: string; phone: string }>({ name: '', email: '', phone: '' })
 const leadSubmitting = ref(false)
@@ -454,6 +627,7 @@ const { listProperties, createLead } = usePublicApi()
 
 const loadFeatured = async () => {
   featuredPending.value = true
+  featuredPage.value = 0
   try {
     const data = await listProperties(resolveSlug(), {
       page: 0,
@@ -489,6 +663,7 @@ const submitLead = async () => {
       email: leadForm.value.email || undefined,
       phone: leadForm.value.phone || undefined,
       message: 'Interesse em serviços exclusivos para proprietários',
+      source: 'PORTAL_HOME_FORM',
     }
     await createLead(resolveSlug(), payload)
     leadSent.value = true

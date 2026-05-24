@@ -13,6 +13,7 @@ export interface TenantWebsiteConfig {
   instagramUrl: string | null
   whatsappNumber: string | null
   facebookUrl: string | null
+  heroImageUrl?: string | null
 }
 
 export const DEFAULT_TENANT_CONFIG: TenantWebsiteConfig = {
@@ -30,4 +31,5 @@ export const DEFAULT_TENANT_CONFIG: TenantWebsiteConfig = {
   instagramUrl: null,
   whatsappNumber: null,
   facebookUrl: null,
+  heroImageUrl: null,
 }

@@ -105,6 +105,12 @@ await createLead(resolveSlug(), { name, email, phone, message })
 
 ## Last Changes
 - **Homepage visual refactor**: Rewrote `pages/index.vue` to match Figma mockup — split hero, tabbed featured section, launches, categories, services+form, stats, blog, CTA
+- **PropertyCard hover effect**: Added sliding action bar at bottom (translate-y-full → translate-y-0 on group-hover). Shows "Ver Detalhes" + chat bubble button. Info panel shifts up (`group-hover:pb-16`) to reveal action bar. Card lifts on hover (`hover:shadow-2xl hover:-translate-y-1`).
+- **Carousel — Imóveis em Destaque**: Replaced static 4-col grid with paginated carousel. State: `featuredPage`, `featuredPages` (chunks of 4), `featuredTotalPages`. Nav arrows (prev/next, disabled at bounds) + dot indicators. Page resets on tab change.
+- **Carousel — Lançamentos Exclusivos**: Same carousel pattern — `launchesPage`, `launchesPages`, `launchesTotalPages`, prev/next functions, dot indicators. Arrow buttons now wired (previously decorative).
 - **PropertyCard component**: Created `components/PropertyCard.vue` (reusable, previously inline)
 - **Layout update**: Added Serviços + Blog nav links; footer expanded to 4-column grid with newsletter + social icon buttons
 - **Tenant connection**: Removed duplicate `getTenantSlug()` from `imoveis/index.vue` and `imoveis/[id].vue` — all pages now use `useTenantConfig().resolveSlug()` consistently. `imoveis/index.vue` now uses `<PropertyCard>` component. Hardcoded colors (`#2563EB`, `#1e2d4d`) replaced with `cfg.primaryColor` in listing + detail pages.
+- **Hero banner image**: `types/tenant.ts` — added `heroImageUrl?: string | null` to `TenantWebsiteConfig`. `pages/index.vue` hero card now renders uploaded image as absolute background with dark overlay (linear-gradient to top), falling back to primary color gradient. Text colors adapt (white over image, slate over gradient).
+- **Hero image bugfix**: `composables/useTenantConfig.ts` `mergeTenantConfig()` now maps `heroImageUrl`. Before this, the field was dropped in merge and never reached `pages/index.vue`, so the hero image did not render even when upload/API were correct.
+- **Conversão de leads instrumentada**: formulários públicos enviam `source` detalhado no payload (`PORTAL_HOME_FORM` na home e `PORTAL_PROPERTY_FORM` no detalhe do imóvel), permitindo segmentação de origem diretamente no CRM de leads.

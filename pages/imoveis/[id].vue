@@ -326,6 +326,7 @@ const submitLead = async () => {
       phone: leadForm.value.phone || undefined,
       message: leadForm.value.message || undefined,
       propertyId: property.value.id,
+      source: 'PORTAL_PROPERTY_FORM',
     })
     leadSuccess.value = true
     leadForm.value = { name: '', email: '', phone: '', message: '' }

@@ -65,4 +65,5 @@ export interface PublicLeadRequest {
   phone?: string
   message?: string
   propertyId?: string
+  source?: string
 }

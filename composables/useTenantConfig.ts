@@ -16,6 +16,7 @@ const mergeTenantConfig = (config?: Partial<TenantWebsiteConfig> | null): Tenant
   instagramUrl: config?.instagramUrl ?? DEFAULT_TENANT_CONFIG.instagramUrl,
   whatsappNumber: config?.whatsappNumber ?? DEFAULT_TENANT_CONFIG.whatsappNumber,
   facebookUrl: config?.facebookUrl ?? DEFAULT_TENANT_CONFIG.facebookUrl,
+  heroImageUrl: config?.heroImageUrl ?? DEFAULT_TENANT_CONFIG.heroImageUrl,
 })
 
 export const useTenantConfig = () => {
