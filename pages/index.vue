@@ -503,7 +503,7 @@
         </p>
         <div class="flex flex-col sm:flex-row items-center justify-center gap-4">
           <a
-            :href="cfg.whatsappNumber ? `https://wa.me/${cfg.whatsappNumber}` : '#'"
+            :href="cfg.whatsappNumber ? `https://wa.me/${cfg.whatsappNumber?.replace(/\\D/g, '')}` : '#'"
             class="px-8 py-3.5 rounded-full text-sm font-bold bg-white transition-all hover:shadow-lg inline-block"
             :style="{ color: cfg.primaryColor }"
           >
