@@ -89,7 +89,7 @@
               <li><a href="#" class="hover:text-white transition-colors">Sobre nós</a></li>
               <li><NuxtLink to="/blog" class="hover:text-white transition-colors">Blog</NuxtLink></li>
               <li><a href="#" class="hover:text-white transition-colors">Carreiras</a></li>
-              <li><NuxtLink to="/auth/login" class="hover:text-white transition-colors">Área do Corretor</NuxtLink></li>
+              <li><a :href="`${publicConfig.appUrl}`" class="hover:text-white transition-colors">Área do Corretor</a></li>
             </ul>
           </div>
 
@@ -146,6 +146,7 @@ const { data: tenantConfig } = await useTenantConfigData()
 const cfg = computed(() => ({ ...DEFAULT_TENANT_CONFIG, ...(tenantConfig.value ?? {}) }))
 const route = useRoute()
 const requestUrl = useRequestURL()
+const { public: publicConfig } = useRuntimeConfig()
 
 useHead({
   htmlAttrs: { lang: 'pt-BR' },
