@@ -1,4 +1,5 @@
 import type { PublicPropertySummary, PublicPropertyDetail, PageResponse, PublicLeadRequest } from '~/types/property'
+import type { PublicBlogPost, PublicBlogPostSummary } from '~/types/blog'
 
 export const usePublicApi = () => {
   const config = useRuntimeConfig()
@@ -39,5 +40,24 @@ export const usePublicApi = () => {
     })
   }
 
-  return { listProperties, getProperty, createLead }
+  const listBlogPosts = async (
+    tenantSlug: string,
+    params: { page?: number; size?: number } = {}
+  ): Promise<PageResponse<PublicBlogPostSummary>> => {
+    const query = new URLSearchParams()
+    if (params.page != null) query.set('page', String(params.page))
+    if (params.size != null) query.set('size', String(params.size))
+    const qs = query.toString()
+    return $fetch(`${API_BASE}/blog-posts${qs ? `?${qs}` : ''}`, {
+      headers: getHeaders(tenantSlug),
+    })
+  }
+
+  const getBlogPost = async (tenantSlug: string, slug: string): Promise<PublicBlogPost> => {
+    return $fetch(`${API_BASE}/blog-posts/${slug}`, {
+      headers: getHeaders(tenantSlug),
+    })
+  }
+
+  return { listProperties, getProperty, createLead, listBlogPosts, getBlogPost }
 }

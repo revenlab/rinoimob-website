@@ -124,19 +124,29 @@ import { DEFAULT_TENANT_CONFIG } from '~/types/tenant'
 
 definePageMeta({ layout: 'default' })
 
-useHead({
-  title: 'Imóveis | Rinoimob',
-  meta: [
-    { name: 'description', content: 'Encontre o imóvel ideal. Casas, apartamentos, terrenos e mais.' },
-  ],
-})
-
 const { listProperties } = usePublicApi()
 const { resolveSlug, useTenantConfigData } = useTenantConfig()
 const { data: tenantConfig } = await useTenantConfigData()
 const cfg = computed(() => ({ ...DEFAULT_TENANT_CONFIG, ...(tenantConfig.value ?? {}) }))
 const route = useRoute()
 const router = useRouter()
+const requestUrl = useRequestURL()
+const listCanonical = computed(() => new URL('/imoveis', requestUrl.origin).toString())
+
+const listDescription = computed(() => {
+  if (hasActiveFilters.value) {
+    const parts = [
+      filters.value.operation ? `operação ${filters.value.operation.toLowerCase()}` : '',
+      filters.value.propertyType ? `tipo ${filters.value.propertyType.toLowerCase()}` : '',
+      filters.value.city ? `em ${filters.value.city}` : '',
+    ].filter(Boolean).join(' ')
+    return parts
+      ? `Resultados de imóveis ${parts.toLowerCase()} disponíveis na ${cfg.value.companyName || 'imobiliária'}.`
+      : 'Veja os imóveis disponíveis.'
+  }
+
+  return cfg.value.description || 'Encontre o imóvel ideal. Casas, apartamentos, terrenos e mais.'
+})
 
 const operationOptions = [
   { label: 'Todos', value: '' },
@@ -170,6 +180,37 @@ const visiblePages = computed(() => {
   if (end - start < 4) start = Math.max(1, end - 4)
   return Array.from({ length: end - start + 1 }, (_, i) => start + i)
 })
+
+useHead(computed(() => ({
+  title: 'Imóveis disponíveis',
+  meta: [
+    { name: 'description', content: listDescription.value },
+    { name: 'robots', content: hasActiveFilters.value ? 'noindex,follow' : 'index,follow' },
+    { property: 'og:title', content: `${cfg.value.companyName || 'Rinoimob'} | Imóveis disponíveis` },
+    { property: 'og:description', content: listDescription.value },
+    { property: 'og:type', content: 'website' },
+    { name: 'twitter:card', content: 'summary_large_image' },
+  ],
+  link: [
+    { rel: 'canonical', href: listCanonical.value },
+  ],
+  script: [
+    {
+      type: 'application/ld+json',
+      children: JSON.stringify({
+        '@context': 'https://schema.org',
+        '@type': 'ItemList',
+        name: 'Lista de imóveis',
+        itemListElement: properties.value.slice(0, 20).map((property, index) => ({
+          '@type': 'ListItem',
+          position: index + 1,
+          url: new URL(`/imoveis/${property.id}`, requestUrl.origin).toString(),
+          name: property.title,
+        })),
+      }),
+    },
+  ],
+})))
 
 
 const syncUrl = () => {
@@ -225,5 +266,5 @@ const clearFilters = () => {
   applyFilters()
 }
 
-onMounted(loadProperties)
+await loadProperties()
 </script>

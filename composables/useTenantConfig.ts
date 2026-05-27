@@ -17,6 +17,22 @@ const mergeTenantConfig = (config?: Partial<TenantWebsiteConfig> | null): Tenant
   whatsappNumber: config?.whatsappNumber ?? DEFAULT_TENANT_CONFIG.whatsappNumber,
   facebookUrl: config?.facebookUrl ?? DEFAULT_TENANT_CONFIG.facebookUrl,
   heroImageUrl: config?.heroImageUrl ?? DEFAULT_TENANT_CONFIG.heroImageUrl,
+  featuredSectionTitle: config?.featuredSectionTitle ?? DEFAULT_TENANT_CONFIG.featuredSectionTitle,
+  featuredSectionSubtitle: config?.featuredSectionSubtitle ?? DEFAULT_TENANT_CONFIG.featuredSectionSubtitle,
+  launchesSectionTitle: config?.launchesSectionTitle ?? DEFAULT_TENANT_CONFIG.launchesSectionTitle,
+  launchesSectionSubtitle: config?.launchesSectionSubtitle ?? DEFAULT_TENANT_CONFIG.launchesSectionSubtitle,
+  categoriesSectionTitle: config?.categoriesSectionTitle ?? DEFAULT_TENANT_CONFIG.categoriesSectionTitle,
+  categoriesSectionSubtitle: config?.categoriesSectionSubtitle ?? DEFAULT_TENANT_CONFIG.categoriesSectionSubtitle,
+  servicesSectionTitle: config?.servicesSectionTitle ?? DEFAULT_TENANT_CONFIG.servicesSectionTitle,
+  servicesSectionSubtitle: config?.servicesSectionSubtitle ?? DEFAULT_TENANT_CONFIG.servicesSectionSubtitle,
+  servicesFormTitle: config?.servicesFormTitle ?? DEFAULT_TENANT_CONFIG.servicesFormTitle,
+  servicesFormSubtitle: config?.servicesFormSubtitle ?? DEFAULT_TENANT_CONFIG.servicesFormSubtitle,
+  statsSectionTitle: config?.statsSectionTitle ?? DEFAULT_TENANT_CONFIG.statsSectionTitle,
+  statsSectionSubtitle: config?.statsSectionSubtitle ?? DEFAULT_TENANT_CONFIG.statsSectionSubtitle,
+  blogSectionTitle: config?.blogSectionTitle ?? DEFAULT_TENANT_CONFIG.blogSectionTitle,
+  blogSectionSubtitle: config?.blogSectionSubtitle ?? DEFAULT_TENANT_CONFIG.blogSectionSubtitle,
+  ctaSectionTitle: config?.ctaSectionTitle ?? DEFAULT_TENANT_CONFIG.ctaSectionTitle,
+  ctaSectionSubtitle: config?.ctaSectionSubtitle ?? DEFAULT_TENANT_CONFIG.ctaSectionSubtitle,
 })
 
 export const useTenantConfig = () => {

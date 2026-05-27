@@ -17,21 +17,15 @@
           <div class="order-2 lg:order-1">
             <div class="inline-flex items-center gap-2 bg-blue-50 border border-blue-100 text-blue-700 px-3 py-1.5 rounded-full text-xs font-semibold uppercase tracking-wider mb-6">
               <span class="w-2 h-2 rounded-full bg-blue-500 animate-pulse"></span>
-              Líder em tecnologia imobiliária
+              {{ cfg.companyName || 'Líder em tecnologia imobiliária' }}
             </div>
 
             <h1 class="text-4xl md:text-5xl font-bold text-slate-900 leading-[1.15] mb-5">
-              Encontre o lugar<br />
-              onde sua
-              <span class="relative" :style="{ color: cfg.primaryColor }">
-                história
-                <span class="absolute -bottom-0.5 left-0 right-0 h-0.5 rounded-full opacity-30" :style="{ backgroundColor: cfg.primaryColor }"></span>
-              </span><br />
-              começa.
+              {{ cfg.heroTitle || 'Encontre o lugar onde sua história começa.' }}
             </h1>
 
             <p class="text-slate-500 text-base lg:text-lg leading-relaxed mb-8 max-w-md">
-              {{ cfg.heroSubtitle || 'A plataforma mais completa para quem busca comprar, alugar ou investir em imóveis com segurança e transparência.' }}
+              {{ cfg.heroSubtitle || cfg.description || 'A plataforma mais completa para quem busca comprar, alugar ou investir em imóveis com segurança e transparência.' }}
             </p>
 
             <!-- Search bar -->
@@ -134,8 +128,8 @@
     <section class="max-w-7xl mx-auto px-4 sm:px-6 py-16">
       <div class="flex flex-col sm:flex-row sm:items-start justify-between gap-4 mb-8">
         <div>
-          <h2 class="text-2xl font-bold text-slate-900">Imóveis em Destaque</h2>
-          <p class="text-slate-500 text-sm mt-1">As melhores oportunidades selecionadas por nossa equipe especializada para você.</p>
+        <h2 class="text-2xl font-bold text-slate-900">{{ cfg.featuredSectionTitle || 'Imóveis em Destaque' }}</h2>
+        <p class="text-slate-500 text-sm mt-1">{{ cfg.featuredSectionSubtitle || 'As melhores oportunidades selecionadas por nossa equipe especializada para você.' }}</p>
         </div>
         <div class="flex items-center gap-3 flex-shrink-0">
           <!-- Nav arrows -->
@@ -241,8 +235,8 @@
       <div class="max-w-7xl mx-auto px-4 sm:px-6">
         <div class="flex items-center justify-between mb-8">
           <div>
-            <h2 class="text-2xl font-bold text-slate-900">Lançamentos Exclusivos</h2>
-            <p class="text-slate-500 text-sm mt-1">Projetos arquitetônicos que definem o futuro de morar bem.</p>
+            <h2 class="text-2xl font-bold text-slate-900">{{ cfg.launchesSectionTitle || 'Lançamentos Exclusivos' }}</h2>
+            <p class="text-slate-500 text-sm mt-1">{{ cfg.launchesSectionSubtitle || 'Projetos arquitetônicos que definem o futuro de morar bem.' }}</p>
           </div>
           <div class="flex items-center gap-2">
             <button
@@ -318,8 +312,8 @@
     ============================================= -->
     <section class="max-w-7xl mx-auto px-4 sm:px-6 py-16">
       <div class="mb-8">
-        <h2 class="text-2xl font-bold text-slate-900">Categorias</h2>
-        <p class="text-slate-500 text-sm mt-1">Explore imóveis por estilo e necessidade.</p>
+        <h2 class="text-2xl font-bold text-slate-900">{{ cfg.categoriesSectionTitle || 'Categorias' }}</h2>
+        <p class="text-slate-500 text-sm mt-1">{{ cfg.categoriesSectionSubtitle || 'Explore imóveis por estilo e necessidade.' }}</p>
       </div>
       <div class="grid grid-cols-2 lg:grid-cols-4 gap-4">
         <NuxtLink
@@ -356,11 +350,9 @@
 
           <!-- Services list -->
           <div>
-            <h2 class="text-3xl font-bold text-white mb-2">
-              Serviços Exclusivos para<br />Proprietários
-            </h2>
+            <h2 class="text-3xl font-bold text-white mb-2">{{ cfg.servicesSectionTitle || 'Serviços Exclusivos para Proprietários' }}</h2>
             <p class="text-white/60 text-sm mb-8">
-              Oferecemos suporte completo para você tomar as melhores decisões com tranquilidade.
+              {{ cfg.servicesSectionSubtitle || 'Oferecemos suporte completo para você tomar as melhores decisões com tranquilidade.' }}
             </p>
             <ul class="space-y-5">
               <li v-for="srv in services" :key="srv.title" class="flex items-start gap-4">
@@ -379,8 +371,8 @@
 
           <!-- Contact form card -->
           <div class="bg-white/10 backdrop-blur-sm rounded-2xl p-6 border border-white/20">
-            <h3 class="text-white font-bold text-base mb-1">Informações de Contato</h3>
-            <p class="text-white/60 text-xs mb-5">Preencha abaixo e um especialista entrará em contato.</p>
+            <h3 class="text-white font-bold text-base mb-1">{{ cfg.servicesFormTitle || 'Informações de Contato' }}</h3>
+            <p class="text-white/60 text-xs mb-5">{{ cfg.servicesFormSubtitle || 'Preencha abaixo e um especialista entrará em contato.' }}</p>
             <form @submit.prevent="submitLead" class="space-y-3">
               <input
                 v-model="leadForm.name"
@@ -421,6 +413,10 @@
     ============================================= -->
     <section class="bg-white border-b border-slate-100 py-16">
       <div class="max-w-7xl mx-auto px-4 sm:px-6">
+        <div class="mb-8 text-center">
+          <h2 class="text-2xl font-bold text-slate-900">{{ cfg.statsSectionTitle || 'Nossa presença no mercado' }}</h2>
+          <p class="text-slate-500 text-sm mt-1">{{ cfg.statsSectionSubtitle || 'Indicadores que mostram a força da nossa operação.' }}</p>
+        </div>
         <div class="grid grid-cols-2 lg:grid-cols-4 gap-8 text-center">
           <div v-for="stat in stats" :key="stat.label">
             <div
@@ -444,11 +440,11 @@
     <section class="max-w-7xl mx-auto px-4 sm:px-6 py-16">
       <div class="flex items-center justify-between mb-8">
         <div>
-          <h2 class="text-2xl font-bold text-slate-900">Dicas e Conteúdos</h2>
-          <p class="text-slate-500 text-sm mt-1">Fique por dentro das tendências do mercado imobiliário.</p>
+          <h2 class="text-2xl font-bold text-slate-900">{{ cfg.blogSectionTitle || 'Dicas e Conteúdos' }}</h2>
+          <p class="text-slate-500 text-sm mt-1">{{ cfg.blogSectionSubtitle || 'Fique por dentro das tendências do mercado imobiliário.' }}</p>
         </div>
-        <a
-          href="#"
+        <NuxtLink
+          to="/blog"
           class="text-sm font-semibold flex items-center gap-1 hover:opacity-70 transition-opacity"
           :style="{ color: cfg.primaryColor }"
         >
@@ -456,21 +452,27 @@
           <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
             <path stroke-linecap="round" stroke-linejoin="round" d="M13.5 4.5L21 12m0 0l-7.5 7.5M21 12H3" />
           </svg>
-        </a>
+        </NuxtLink>
       </div>
       <div class="grid grid-cols-1 sm:grid-cols-3 gap-6">
-        <div v-for="post in blogPosts" :key="post.title" class="group cursor-pointer">
+        <NuxtLink v-for="post in blogPosts" :key="post.slug" :to="`/blog/${post.slug}`" class="group cursor-pointer block">
           <div class="rounded-2xl overflow-hidden mb-4" style="aspect-ratio: 16/9;">
+            <img
+              v-if="post.coverImageUrl"
+              :src="post.coverImageUrl"
+              :alt="post.title"
+              class="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
+            >
             <div
-              class="w-full h-full transition-transform duration-300 group-hover:scale-105"
-              :style="{ background: post.gradient }"
+              v-else
+              class="w-full h-full transition-transform duration-300 group-hover:scale-105 bg-gradient-to-br from-blue-500 to-indigo-600"
             ></div>
           </div>
           <span
             class="text-xs font-bold px-2.5 py-1 rounded-full"
             :style="{ backgroundColor: cfg.primaryColor + '15', color: cfg.primaryColor }"
           >
-            {{ post.tag }}
+            Blog
           </span>
           <h3 class="font-semibold text-slate-900 mt-2 text-sm leading-snug group-hover:opacity-70 transition-opacity">
             {{ post.title }}
@@ -481,7 +483,7 @@
               <path stroke-linecap="round" stroke-linejoin="round" d="M13.5 4.5L21 12m0 0l-7.5 7.5M21 12H3" />
             </svg>
           </p>
-        </div>
+        </NuxtLink>
       </div>
     </section>
 
@@ -494,10 +496,10 @@
         :style="{ backgroundColor: cfg.primaryColor }"
       >
         <h2 class="text-3xl md:text-4xl font-bold text-white mb-3 leading-tight">
-          Pronto para encontrar<br />seu novo lar?
+          {{ cfg.ctaSectionTitle || 'Pronto para encontrar seu novo lar?' }}
         </h2>
         <p class="text-white/70 text-base mb-8 max-w-md mx-auto">
-          Nossos corretores estão prontos para te guiar em cada passo dessa jornada.
+          {{ cfg.ctaSectionSubtitle || 'Nossos corretores estão prontos para te guiar em cada passo dessa jornada.' }}
         </p>
         <div class="flex flex-col sm:flex-row items-center justify-center gap-4">
           <a
@@ -523,6 +525,7 @@
 <script setup lang="ts">
 import type { PublicPropertySummary } from '~/types/property'
 import type { PublicLeadRequest } from '~/types/property'
+import type { PublicBlogPostSummary } from '~/types/blog'
 import { DEFAULT_TENANT_CONFIG } from '~/types/tenant'
 
 definePageMeta({ layout: 'default' })
@@ -537,6 +540,15 @@ const onHeroMouseMove = (e: MouseEvent) => {
   const rect = heroRef.value.getBoundingClientRect()
   mouseX.value = ((e.clientX - rect.left) / rect.width - 0.5) * 2
   mouseY.value = ((e.clientY - rect.top) / rect.height - 0.5) * 2
+}
+
+const loadBlogPosts = async () => {
+  try {
+    const data = await listBlogPosts(resolveSlug(), { page: 0, size: 3 })
+    blogPosts.value = data.content
+  } catch {
+    blogPosts.value = []
+  }
 }
 const resetMouse = () => {
   mouseX.value = 0
@@ -602,10 +614,60 @@ const nextLaunches = () => { if (launchesPage.value < launchesTotalPages.value -
 const leadForm = ref<{ name: string; email: string; phone: string }>({ name: '', email: '', phone: '' })
 const leadSubmitting = ref(false)
 const leadSent = ref(false)
+const blogPosts = ref<PublicBlogPostSummary[]>([])
 
 const { useTenantConfigData, resolveSlug } = useTenantConfig()
 const { data: tenantConfig } = await useTenantConfigData()
 const cfg = computed(() => ({ ...DEFAULT_TENANT_CONFIG, ...(tenantConfig.value ?? {}) }))
+const requestUrl = useRequestURL()
+const homepageCanonical = computed(() => new URL('/', requestUrl.origin).toString())
+
+const homepageDescription = computed(() =>
+  cfg.value.description || 'Encontre imóveis, publique seu interesse e fale direto com a imobiliária.'
+)
+
+useHead(computed(() => ({
+  title: 'Imóveis para comprar, alugar e investir',
+  meta: [
+    { name: 'description', content: homepageDescription.value },
+    { property: 'og:title', content: cfg.value.companyName || 'Rinoimob' },
+    { property: 'og:description', content: homepageDescription.value },
+    { property: 'og:image', content: cfg.value.heroImageUrl || cfg.value.logoUrl || '' },
+    { property: 'og:type', content: 'website' },
+    { name: 'twitter:card', content: 'summary_large_image' },
+    { name: 'twitter:title', content: cfg.value.companyName || 'Rinoimob' },
+    { name: 'twitter:description', content: homepageDescription.value },
+  ],
+  link: [
+    { rel: 'canonical', href: homepageCanonical.value },
+  ],
+  script: [
+    {
+      type: 'application/ld+json',
+      children: JSON.stringify([
+        {
+          '@context': 'https://schema.org',
+          '@type': 'WebSite',
+          name: cfg.value.companyName || 'Rinoimob',
+          url: homepageCanonical.value,
+          potentialAction: {
+            '@type': 'SearchAction',
+            target: `${requestUrl.origin}/imoveis?city={search_term_string}`,
+            'query-input': 'required name=search_term_string',
+          },
+        },
+        {
+          '@context': 'https://schema.org',
+          '@type': 'Organization',
+          name: cfg.value.companyName || 'Rinoimob',
+          url: homepageCanonical.value,
+          logo: cfg.value.logoUrl || undefined,
+          sameAs: [cfg.value.instagramUrl, cfg.value.facebookUrl].filter(Boolean),
+        },
+      ]),
+    },
+  ],
+})))
 
 const featuredTabs = [
   { label: 'Comprar', value: 'SALE' as const },
@@ -623,7 +685,7 @@ const doSearch = () => {
   })
 }
 
-const { listProperties, createLead } = usePublicApi()
+const { listProperties, createLead, listBlogPosts } = usePublicApi()
 
 const loadFeatured = async () => {
   featuredPending.value = true
@@ -678,6 +740,7 @@ const submitLead = async () => {
 onMounted(() => {
   loadFeatured()
   loadLaunches()
+  loadBlogPosts()
 })
 
 const categories = [
@@ -753,21 +816,4 @@ const stats = [
   },
 ]
 
-const blogPosts = [
-  {
-    tag: 'DICAS',
-    title: '10 dicas para comprar seu primeiro imóvel sem erros',
-    gradient: 'linear-gradient(135deg, #0ea5e9 0%, #0284c7 100%)',
-  },
-  {
-    tag: 'DECOR',
-    title: 'Como valorizar seu imóvel antes de colocar à venda',
-    gradient: 'linear-gradient(135deg, #8b5cf6 0%, #6d28d9 100%)',
-  },
-  {
-    tag: 'MERCADO',
-    title: 'Tendências do mercado imobiliário para 2025',
-    gradient: 'linear-gradient(135deg, #f59e0b 0%, #d97706 100%)',
-  },
-]
 </script>

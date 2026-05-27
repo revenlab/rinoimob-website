@@ -264,21 +264,11 @@ const { getProperty, createLead } = usePublicApi()
 const { resolveSlug, useTenantConfigData } = useTenantConfig()
 const { data: tenantConfig } = await useTenantConfigData()
 const cfg = computed(() => ({ ...DEFAULT_TENANT_CONFIG, ...(tenantConfig.value ?? {}) }))
+const requestUrl = useRequestURL()
 
 const property = ref<PublicPropertyDetail | null>(null)
 const activePhoto = ref<PublicPhoto | null>(null)
 const pending = ref(true)
-
-useHead(computed(() => ({
-  title: property.value ? `${property.value.title} | Rinoimob` : 'Imóvel | Rinoimob',
-  meta: [
-    { name: 'description', content: property.value?.description?.slice(0, 160) ?? '' },
-    { property: 'og:title', content: property.value?.title ?? '' },
-    { property: 'og:description', content: property.value?.description?.slice(0, 160) ?? '' },
-    { property: 'og:image', content: property.value?.photos?.[0]?.url ?? property.value?.coverPhotoUrl ?? '' },
-    { property: 'og:type', content: 'website' },
-  ],
-})))
 
 const operationLabel = (op: string) => ({ SALE: 'Venda', RENT: 'Aluguel', SEASONAL: 'Temporada' }[op] ?? op)
 const operationBg = (op: string) => ({
@@ -292,6 +282,51 @@ const typeLabel = (t: string) => ({
 
 const formatPrice = (price: number, currency: string) =>
   new Intl.NumberFormat('pt-BR', { style: 'currency', currency: currency || 'BRL', maximumFractionDigits: 0 }).format(price)
+
+const buildPropertyDescription = (item: PublicPropertyDetail | null) => {
+  if (!item) return 'Veja os detalhes do imóvel disponível.'
+
+  const addressParts = [item.addressNeighborhood, item.addressCity, item.addressState].filter(Boolean).join(', ')
+  const pricePart = item.price ? ` por ${formatPrice(item.price, item.currency)}` : ''
+  const summary = item.description?.trim() || `Imóvel ${operationLabel(item.operation).toLowerCase()}${pricePart}${addressParts ? ` em ${addressParts}` : ''}`
+  return summary.slice(0, 160)
+}
+
+const currentCanonical = computed(() => new URL(`/imoveis/${route.params.id}`, requestUrl.origin).toString())
+
+useHead(computed(() => ({
+  title: property.value ? property.value.title : 'Imóvel',
+  meta: [
+    { name: 'description', content: buildPropertyDescription(property.value) },
+    { name: 'robots', content: property.value ? 'index,follow' : 'noindex,follow' },
+    { property: 'og:title', content: property.value?.title ?? 'Imóvel' },
+    { property: 'og:description', content: buildPropertyDescription(property.value) },
+    { property: 'og:image', content: activePhoto.value?.url ?? property.value?.coverPhotoUrl ?? cfg.value.logoUrl ?? '' },
+    { property: 'og:type', content: 'product' },
+    { name: 'twitter:card', content: 'summary_large_image' },
+  ],
+  link: [
+    { rel: 'canonical', href: currentCanonical.value },
+  ],
+  script: property.value ? [
+    {
+      type: 'application/ld+json',
+      children: JSON.stringify({
+        '@context': 'https://schema.org',
+        '@type': 'RealEstateListing',
+        name: property.value.title,
+        url: currentCanonical.value,
+        description: buildPropertyDescription(property.value),
+        image: (property.value.photos?.map(photo => photo.url) ?? []).concat(property.value.coverPhotoUrl ? [property.value.coverPhotoUrl] : []).filter(Boolean),
+        offers: property.value.price ? {
+          '@type': 'Offer',
+          price: property.value.price,
+          priceCurrency: property.value.currency || 'BRL',
+        } : undefined,
+      }),
+    },
+  ] : [],
+})))
 
 const hasAddress = computed(() =>
   property.value && (property.value.addressStreet || property.value.addressNeighborhood || property.value.addressCity)
@@ -337,7 +372,7 @@ const submitLead = async () => {
   }
 }
 
-onMounted(async () => {
+const loadProperty = async () => {
   try {
     const id = route.params.id as string
     const data = await getProperty(resolveSlug(), id)
@@ -352,6 +387,14 @@ onMounted(async () => {
     property.value = null
   } finally {
     pending.value = false
+  }
+}
+
+await loadProperty()
+
+onMounted(async () => {
+  if (!property.value) {
+    await loadProperty()
   }
 })
 </script>

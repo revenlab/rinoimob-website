@@ -27,7 +27,7 @@
 - **Localhost fallback**: uses `?tenant=` query param, defaults to `demo`
 
 ## Key Types
-- `TenantWebsiteConfig` — branding/config (`primaryColor`, `secondaryColor`, `heroTitle`, etc.)
+- `TenantWebsiteConfig` — branding/config (`primaryColor`, `secondaryColor`, `heroTitle`, `featuredSectionTitle`, `ctaSectionTitle`, etc.)
 - `DEFAULT_TENANT_CONFIG` — fallback if API fails (`primaryColor: #1e2d4d`, `secondaryColor: #2563EB`)
 - `PublicPropertySummary` — list card data (id, title, price, operation, type, area, bedrooms, etc.)
 - `PublicPropertyDetail` — full detail + photos/amenities/categories
@@ -48,9 +48,9 @@ Sections (top → bottom):
 3. **Lançamentos Exclusivos** — SEASONAL properties, 4-col grid with nav arrows
 4. **Categorias** — 4 gradient cards: Casas, Apartamentos, Comerciais, Terrenos
 5. **Serviços Exclusivos** — dark `cfg.primaryColor` bg, services checklist left + lead form right
-6. **Stats** — 4 metrics (2.500+ vendidos, 10k+ clientes, 15+ anos, 12 prêmios)
-7. **Dicas e Conteúdos** — 3 static blog post cards with gradient placeholders
-8. **CTA Banner** — dark rounded rectangle, two CTA buttons
+6. **Stats** — configurable heading/subheading + 4 metrics
+7. **Dicas e Conteúdos** — configurable heading/subheading + 3 static blog post cards
+8. **CTA Banner** — configurable heading/subheading + two CTA buttons
 
 ### `pages/imoveis/index.vue` — Listing page
 ### `pages/imoveis/[id].vue` — Property detail
@@ -105,6 +105,7 @@ await createLead(resolveSlug(), { name, email, phone, message })
 
 ## Last Changes
 - **Homepage visual refactor**: Rewrote `pages/index.vue` to match Figma mockup — split hero, tabbed featured section, launches, categories, services+form, stats, blog, CTA
+- **CMS de home**: `TenantWebsiteConfig` agora carrega títulos/subtítulos editáveis para as seções principais e `pages/index.vue` consome esses campos; `useTenantConfig` faz merge completo com defaults.
 - **PropertyCard hover effect**: Added sliding action bar at bottom (translate-y-full → translate-y-0 on group-hover). Shows "Ver Detalhes" + chat bubble button. Info panel shifts up (`group-hover:pb-16`) to reveal action bar. Card lifts on hover (`hover:shadow-2xl hover:-translate-y-1`).
 - **Carousel — Imóveis em Destaque**: Replaced static 4-col grid with paginated carousel. State: `featuredPage`, `featuredPages` (chunks of 4), `featuredTotalPages`. Nav arrows (prev/next, disabled at bounds) + dot indicators. Page resets on tab change.
 - **Carousel — Lançamentos Exclusivos**: Same carousel pattern — `launchesPage`, `launchesPages`, `launchesTotalPages`, prev/next functions, dot indicators. Arrow buttons now wired (previously decorative).
@@ -114,3 +115,5 @@ await createLead(resolveSlug(), { name, email, phone, message })
 - **Hero banner image**: `types/tenant.ts` — added `heroImageUrl?: string | null` to `TenantWebsiteConfig`. `pages/index.vue` hero card now renders uploaded image as absolute background with dark overlay (linear-gradient to top), falling back to primary color gradient. Text colors adapt (white over image, slate over gradient).
 - **Hero image bugfix**: `composables/useTenantConfig.ts` `mergeTenantConfig()` now maps `heroImageUrl`. Before this, the field was dropped in merge and never reached `pages/index.vue`, so the hero image did not render even when upload/API were correct.
 - **Conversão de leads instrumentada**: formulários públicos enviam `source` detalhado no payload (`PORTAL_HOME_FORM` na home e `PORTAL_PROPERTY_FORM` no detalhe do imóvel), permitindo segmentação de origem diretamente no CRM de leads.
+- **SEO do website**: `layouts/default.vue` agora injeta defaults globais (lang, theme-color, og site_name, favicon). Home, listagem e detalhe têm canonical, meta OG/Twitter e JSON-LD. Também existem rotas server-side `robots.txt` e `sitemap.xml` por tenant.
+- **Blog em produção (API real)**: páginas `pages/blog/index.vue` e `pages/blog/[slug].vue` agora consomem `/api/v1/public/blog-posts` e `/api/v1/public/blog-posts/{slug}` por tenant; home também puxa os 3 posts mais recentes da API e o `sitemap.xml` inclui posts publicados retornados do backend.

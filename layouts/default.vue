@@ -12,7 +12,7 @@
           <NuxtLink to="/imoveis" class="text-sm font-medium text-slate-600 hover:text-slate-900 transition-colors">Imóveis</NuxtLink>
           <NuxtLink to="/imoveis?operation=SEASONAL" class="text-sm font-medium text-slate-600 hover:text-slate-900 transition-colors">Lançamentos</NuxtLink>
           <a href="#sobre" class="text-sm font-medium text-slate-600 hover:text-slate-900 transition-colors">Serviços</a>
-          <a href="#" class="text-sm font-medium text-slate-600 hover:text-slate-900 transition-colors">Blog</a>
+          <NuxtLink to="/blog" class="text-sm font-medium text-slate-600 hover:text-slate-900 transition-colors">Blog</NuxtLink>
         </nav>
         <div class="flex items-center gap-3">
           <NuxtLink to="/auth/login" class="text-sm font-medium" :style="{ color: cfg.primaryColor }">Entrar</NuxtLink>
@@ -87,7 +87,7 @@
             <h3 class="font-semibold text-white mb-4 text-sm uppercase tracking-wider">Empresa</h3>
             <ul class="space-y-2.5 text-sm text-white/60">
               <li><a href="#" class="hover:text-white transition-colors">Sobre nós</a></li>
-              <li><a href="#" class="hover:text-white transition-colors">Blog</a></li>
+              <li><NuxtLink to="/blog" class="hover:text-white transition-colors">Blog</NuxtLink></li>
               <li><a href="#" class="hover:text-white transition-colors">Carreiras</a></li>
               <li><NuxtLink to="/auth/login" class="hover:text-white transition-colors">Área do Corretor</NuxtLink></li>
             </ul>
@@ -144,9 +144,19 @@ import { DEFAULT_TENANT_CONFIG } from '~/types/tenant'
 const { useTenantConfigData } = useTenantConfig()
 const { data: tenantConfig } = await useTenantConfigData()
 const cfg = computed(() => ({ ...DEFAULT_TENANT_CONFIG, ...(tenantConfig.value ?? {}) }))
+const route = useRoute()
+const requestUrl = useRequestURL()
 
 useHead({
+  htmlAttrs: { lang: 'pt-BR' },
   titleTemplate: (title) => title ? `${title} | ${cfg.value.companyName}` : cfg.value.companyName || 'Rinoimob',
   link: computed(() => cfg.value.faviconUrl ? [{ rel: 'icon', href: cfg.value.faviconUrl }] : []),
+  meta: computed(() => [
+    { name: 'theme-color', content: cfg.value.primaryColor || '#1e2d4d' },
+    { property: 'og:site_name', content: cfg.value.companyName || 'Rinoimob' },
+    { property: 'og:url', content: new URL(route.fullPath, requestUrl.origin).toString() },
+    { property: 'og:locale', content: 'pt_BR' },
+    { name: 'twitter:card', content: 'summary_large_image' },
+  ]),
 })
 </script>
