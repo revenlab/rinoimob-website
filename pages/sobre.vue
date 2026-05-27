@@ -115,8 +115,9 @@ import { DEFAULT_TENANT_CONFIG } from '~/types/tenant'
 
 definePageMeta({ layout: 'default' })
 
-const { $tenantConfig } = useNuxtApp()
-const cfg = computed(() => ({ ...DEFAULT_TENANT_CONFIG, ...($tenantConfig as Record<string, unknown> || {}) }))
+const { useTenantConfigData } = useTenantConfig()
+const { data: tenantConfig } = await useTenantConfigData()
+const cfg = computed(() => ({ ...DEFAULT_TENANT_CONFIG, ...(tenantConfig.value ?? {}) }))
 
 useSeoMeta({
   title: () => cfg.value.aboutPageTitle || `Sobre - ${cfg.value.companyName || 'Rinoimob'}`,

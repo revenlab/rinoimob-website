@@ -11,7 +11,7 @@
         <nav class="hidden md:flex items-center gap-6">
           <NuxtLink to="/imoveis" class="text-sm font-medium text-slate-600 hover:text-slate-900 transition-colors">Imóveis</NuxtLink>
           <NuxtLink to="/imoveis?operation=SEASONAL" class="text-sm font-medium text-slate-600 hover:text-slate-900 transition-colors">Lançamentos</NuxtLink>
-          <a href="#sobre" class="text-sm font-medium text-slate-600 hover:text-slate-900 transition-colors">Serviços</a>
+          <NuxtLink to="/sobre" class="text-sm font-medium text-slate-600 hover:text-slate-900 transition-colors">Sobre</NuxtLink>
           <NuxtLink to="/blog" class="text-sm font-medium text-slate-600 hover:text-slate-900 transition-colors">Blog</NuxtLink>
         </nav>
         <div class="flex items-center gap-3">
@@ -86,7 +86,7 @@
           <div>
             <h3 class="font-semibold text-white mb-4 text-sm uppercase tracking-wider">Empresa</h3>
             <ul class="space-y-2.5 text-sm text-white/60">
-              <li><a href="#" class="hover:text-white transition-colors">Sobre nós</a></li>
+              <li><NuxtLink to="/sobre" class="hover:text-white transition-colors">Sobre nós</NuxtLink></li>
               <li><NuxtLink to="/blog" class="hover:text-white transition-colors">Blog</NuxtLink></li>
               <li><a href="#" class="hover:text-white transition-colors">Carreiras</a></li>
               <li><a :href="`${publicConfig.appUrl}`" class="hover:text-white transition-colors">Área do Corretor</a></li>
