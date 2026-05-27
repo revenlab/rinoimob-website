@@ -33,6 +33,16 @@ const mergeTenantConfig = (config?: Partial<TenantWebsiteConfig> | null): Tenant
   blogSectionSubtitle: config?.blogSectionSubtitle ?? DEFAULT_TENANT_CONFIG.blogSectionSubtitle,
   ctaSectionTitle: config?.ctaSectionTitle ?? DEFAULT_TENANT_CONFIG.ctaSectionTitle,
   ctaSectionSubtitle: config?.ctaSectionSubtitle ?? DEFAULT_TENANT_CONFIG.ctaSectionSubtitle,
+  aboutPageTitle: config?.aboutPageTitle ?? DEFAULT_TENANT_CONFIG.aboutPageTitle,
+  aboutPageSubtitle: config?.aboutPageSubtitle ?? DEFAULT_TENANT_CONFIG.aboutPageSubtitle,
+  aboutPageDescription: config?.aboutPageDescription ?? DEFAULT_TENANT_CONFIG.aboutPageDescription,
+  aboutImageUrl: config?.aboutImageUrl ?? DEFAULT_TENANT_CONFIG.aboutImageUrl,
+  aboutMission: config?.aboutMission ?? DEFAULT_TENANT_CONFIG.aboutMission,
+  aboutVision: config?.aboutVision ?? DEFAULT_TENANT_CONFIG.aboutVision,
+  aboutValues: config?.aboutValues ?? DEFAULT_TENANT_CONFIG.aboutValues,
+  aboutFoundedYear: config?.aboutFoundedYear ?? DEFAULT_TENANT_CONFIG.aboutFoundedYear,
+  aboutTeamCount: config?.aboutTeamCount ?? DEFAULT_TENANT_CONFIG.aboutTeamCount,
+  aboutPropertiesCount: config?.aboutPropertiesCount ?? DEFAULT_TENANT_CONFIG.aboutPropertiesCount,
 })
 
 export const useTenantConfig = () => {
