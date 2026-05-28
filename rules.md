@@ -44,8 +44,8 @@
 ### `pages/index.vue` — Homepage (last updated: visual refactor to match Figma mockup)
 Sections (top → bottom):
 1. **Hero** — split 2-col layout (text+search left, branded card right), floating stats badges
-2. **Imóveis em Destaque** — filter tabs (Comprar/Alugar/Na Planta) + 4-col property card grid
-3. **Lançamentos Exclusivos** — SEASONAL properties, 4-col grid with nav arrows
+2. **Imóveis em Destaque** — filter tabs (Comprar/Alugar/Temporada) + 4-col property card grid
+3. **Lançamentos Exclusivos** — categoria global `lancamentos`, 4-col grid with nav arrows
 4. **Categorias** — 4 gradient cards: Casas, Apartamentos, Comerciais, Terrenos
 5. **Serviços Exclusivos** — dark `cfg.primaryColor` bg, services checklist left + lead form right
 6. **Stats** — configurable heading/subheading + 4 metrics
@@ -105,6 +105,7 @@ await createLead(resolveSlug(), { name, email, phone, message })
 
 ## Last Changes
 - **Homepage visual refactor**: Rewrote `pages/index.vue` to match Figma mockup — split hero, tabbed featured section, launches, categories, services+form, stats, blog, CTA
+- **Lançamentos da home**: seção de lançamentos agora consulta `categorySlug=lancamentos` no público; links do header/footer e a listagem pública também entendem `categorySlug`. `SEASONAL` voltou a ser rotulado como `Temporada`.
 - **CMS de home**: `TenantWebsiteConfig` agora carrega títulos/subtítulos editáveis para as seções principais e `pages/index.vue` consome esses campos; `useTenantConfig` faz merge completo com defaults.
 - **PropertyCard hover effect**: Added sliding action bar at bottom (translate-y-full → translate-y-0 on group-hover). Shows "Ver Detalhes" + chat bubble button. Info panel shifts up (`group-hover:pb-16`) to reveal action bar. Card lifts on hover (`hover:shadow-2xl hover:-translate-y-1`).
 - **Carousel — Imóveis em Destaque**: Replaced static 4-col grid with paginated carousel. State: `featuredPage`, `featuredPages` (chunks of 4), `featuredTotalPages`. Nav arrows (prev/next, disabled at bounds) + dot indicators. Page resets on tab change.

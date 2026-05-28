@@ -10,7 +10,7 @@
         </NuxtLink>
         <nav class="hidden md:flex items-center gap-6">
           <NuxtLink to="/imoveis" class="text-sm font-medium text-slate-600 hover:text-slate-900 transition-colors">Imóveis</NuxtLink>
-          <NuxtLink to="/imoveis?operation=SEASONAL" class="text-sm font-medium text-slate-600 hover:text-slate-900 transition-colors">Lançamentos</NuxtLink>
+          <NuxtLink to="/imoveis?categorySlug=lancamentos" class="text-sm font-medium text-slate-600 hover:text-slate-900 transition-colors">Lançamentos</NuxtLink>
           <NuxtLink to="/sobre" class="text-sm font-medium text-slate-600 hover:text-slate-900 transition-colors">Sobre</NuxtLink>
           <NuxtLink to="/blog" class="text-sm font-medium text-slate-600 hover:text-slate-900 transition-colors">Blog</NuxtLink>
         </nav>
@@ -99,7 +99,7 @@
             <ul class="space-y-2.5 text-sm text-white/60">
               <li><NuxtLink to="/imoveis" class="hover:text-white transition-colors">Comprar imóvel</NuxtLink></li>
               <li><NuxtLink to="/imoveis?operation=RENT" class="hover:text-white transition-colors">Alugar imóvel</NuxtLink></li>
-              <li><NuxtLink to="/imoveis?operation=SEASONAL" class="hover:text-white transition-colors">Lançamentos</NuxtLink></li>
+              <li><NuxtLink to="/imoveis?categorySlug=lancamentos" class="hover:text-white transition-colors">Lançamentos</NuxtLink></li>
               <li><NuxtLink to="/imoveis" class="hover:text-white transition-colors">Anunciar imóvel</NuxtLink></li>
             </ul>
           </div>

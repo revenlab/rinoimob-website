@@ -672,7 +672,7 @@ useHead(computed(() => ({
 const featuredTabs = [
   { label: 'Comprar', value: 'SALE' as const },
   { label: 'Alugar', value: 'RENT' as const },
-  { label: 'Na Planta', value: 'SEASONAL' as const },
+  { label: 'Temporada', value: 'SEASONAL' as const },
 ]
 
 const doSearch = () => {
@@ -707,7 +707,7 @@ const loadFeatured = async () => {
 const loadLaunches = async () => {
   launchesPending.value = true
   try {
-    const data = await listProperties(resolveSlug(), { page: 0, size: 4, operation: 'SEASONAL' })
+    const data = await listProperties(resolveSlug(), { page: 0, size: 4, categorySlug: 'lancamentos' })
     launches.value = data.content
   } catch {
     launches.value = []

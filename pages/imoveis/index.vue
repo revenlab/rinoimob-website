@@ -158,6 +158,7 @@ const operationOptions = [
 const filters = ref({
   operation: (route.query.operation as string) || '',
   propertyType: (route.query.propertyType as string) || '',
+  categorySlug: (route.query.categorySlug as string) || '',
   city: (route.query.city as string) || '',
   maxPrice: (route.query.maxPrice as string) || '',
 })
@@ -168,7 +169,7 @@ const properties = ref<PublicPropertySummary[]>([])
 const pending = ref(true)
 
 const hasActiveFilters = computed(() =>
-  !!(filters.value.operation || filters.value.propertyType || filters.value.city || filters.value.maxPrice)
+  !!(filters.value.operation || filters.value.propertyType || filters.value.categorySlug || filters.value.city || filters.value.maxPrice)
 )
 
 const visiblePages = computed(() => {
@@ -217,6 +218,7 @@ const syncUrl = () => {
   const query: Record<string, string> = {}
   if (filters.value.operation) query.operation = filters.value.operation
   if (filters.value.propertyType) query.propertyType = filters.value.propertyType
+  if (filters.value.categorySlug) query.categorySlug = filters.value.categorySlug
   if (filters.value.city) query.city = filters.value.city
   if (filters.value.maxPrice) query.maxPrice = filters.value.maxPrice
   if (currentPage.value > 0) query.page = String(currentPage.value + 1)
@@ -231,6 +233,7 @@ const loadProperties = async () => {
       size: 12,
       operation: filters.value.operation || undefined,
       propertyType: filters.value.propertyType || undefined,
+      categorySlug: filters.value.categorySlug || undefined,
       city: filters.value.city || undefined,
       maxPrice: filters.value.maxPrice || undefined,
     })
@@ -262,7 +265,7 @@ const goToPage = (page: number) => {
 }
 
 const clearFilters = () => {
-  filters.value = { operation: '', propertyType: '', city: '', maxPrice: '' }
+  filters.value = { operation: '', propertyType: '', categorySlug: '', city: '', maxPrice: '' }
   applyFilters()
 }
 

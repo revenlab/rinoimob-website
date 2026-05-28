@@ -223,7 +223,8 @@
 
               <div class="mt-3 border-t border-slate-100 pt-3 space-y-2">
                 <a
-                  :href="`https://wa.me/${cfg.value.whatsappNumber?.replace(/\D/g, '')}?text=Olá, tenho interesse no imóvel: ${property.title}`"
+                  v-if="cfg.whatsappNumber"
+                  :href="`https://wa.me/${cfg.whatsappNumber?.replace(/\D/g, '')}?text=Olá, tenho interesse no imóvel: ${property.title}`"
                   target="_blank"
                   class="flex items-center justify-center gap-2 w-full py-3 text-sm font-semibold text-white rounded-xl bg-green-500 hover:bg-green-600 transition-colors"
                 >

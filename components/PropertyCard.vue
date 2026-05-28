@@ -86,7 +86,7 @@ const props = defineProps<{
 const operationLabel = computed(() => ({
   SALE: 'Venda',
   RENT: 'Aluguel',
-  SEASONAL: 'Lançamento',
+  SEASONAL: 'Temporada',
 }[props.property.operation] ?? props.property.operation))
 
 const operationColor = computed(() => ({
