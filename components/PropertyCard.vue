@@ -2,7 +2,7 @@
   <NuxtLink
     :to="`/imoveis/${property.id}`"
     class="group relative rounded-2xl overflow-hidden block bg-slate-100 flex-shrink-0 transition-all duration-300 hover:shadow-2xl hover:-translate-y-1"
-    style="aspect-ratio: 4/3;"
+    :class="cardAspectRatioClass"
   >
     <img
       v-if="property.coverPhotoUrl"
@@ -28,10 +28,13 @@
 
     <button
       class="absolute top-3 right-3 bg-white/90 rounded-full p-2 shadow hover:bg-white transition-colors"
-      @click.prevent.stop
+      @click.prevent.stop="handleFavoriteClick"
       aria-label="Favoritar"
     >
-      <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-4 h-4 text-slate-500">
+      <svg v-if="isPropertyFavorited" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="w-4 h-4 text-red-500">
+        <path d="M11.645 20.745L.516 3.714A2.25 2.25 0 012.004 2.25h5.676c.54 0 1.079.176 1.519.529L12 5.863l3.01-2.554c.44-.353.979-.53 1.519-.53h5.676a2.25 2.25 0 011.488 1.464l-11.645 17.03z" />
+      </svg>
+      <svg v-else xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-4 h-4 text-slate-500">
         <path stroke-linecap="round" stroke-linejoin="round" d="M21 8.25c0-2.485-2.099-4.5-4.688-4.5-1.935 0-3.597 1.126-4.312 2.733-.715-1.607-2.377-2.733-4.313-2.733C5.1 3.75 3 5.765 3 8.25c0 7.22 9 12 9 12s9-4.78 9-12z" />
       </svg>
     </button>
@@ -79,9 +82,29 @@
 <script setup lang="ts">
 import type { PublicPropertySummary } from '~/types/property'
 
-const props = defineProps<{
+const props = withDefaults(defineProps<{
   property: PublicPropertySummary
-}>()
+  cardVariant?: 'default' | 'vertical'
+}>(), {
+  cardVariant: 'default',
+})
+
+const { toggleFavorite, isFavorited } = useLocalStorageFavorites()
+
+const isPropertyFavorited = ref(false)
+
+onMounted(() => {
+  isPropertyFavorited.value = isFavorited(props.property.id)
+})
+
+const handleFavoriteClick = () => {
+  const newState = toggleFavorite(props.property.id)
+  isPropertyFavorited.value = newState
+}
+
+const cardAspectRatioClass = computed(() => (
+  props.cardVariant === 'vertical' ? 'aspect-[4/5]' : 'aspect-[4/3]'
+))
 
 const operationLabel = computed(() => ({
   SALE: 'Venda',
