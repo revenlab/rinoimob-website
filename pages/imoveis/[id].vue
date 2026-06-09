@@ -56,7 +56,21 @@
                   {{ typeLabel(property.propertyType) }}
                 </span>
               </div>
-              <h1 class="text-2xl font-bold text-[#1e2d4d]">{{ property.title }}</h1>
+              <div class="flex items-start justify-between gap-4">
+                <h1 class="text-2xl font-bold text-[#1e2d4d]">{{ property.title }}</h1>
+                <button
+                  @click="handleFavoriteClick"
+                  class="flex-shrink-0 p-2 hover:bg-slate-100 rounded-full transition-colors"
+                  :title="isPropertyFavorited ? 'Remover dos favoritos' : 'Adicionar aos favoritos'"
+                >
+                  <svg v-if="isPropertyFavorited" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="w-6 h-6 text-red-500">
+                    <path d="M11.645 20.745L.516 3.714A2.25 2.25 0 012.004 2.25h5.676c.54 0 1.079.176 1.519.529L12 5.863l3.01-2.554c.44-.353.979-.53 1.519-.53h5.676a2.25 2.25 0 011.488 1.464l-11.645 17.03z" />
+                  </svg>
+                  <svg v-else xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6 text-slate-400">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M21 8.25c0-2.485-2.099-4.5-4.688-4.5-1.935 0-3.597 1.126-4.312 2.733-.715-1.607-2.377-2.733-4.313-2.733C5.1 3.75 3 5.765 3 8.25c0 7.22 9 12 9 12s9-4.78 9-12z" />
+                  </svg>
+                </button>
+              </div>
               <p v-if="hasAddress" class="text-slate-500 text-sm mt-2 flex items-center gap-1">
                 <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-4 h-4 shrink-0">
                   <path stroke-linecap="round" stroke-linejoin="round" d="M15 10.5a3 3 0 11-6 0 3 3 0 016 0z" />
@@ -187,12 +201,7 @@
                   />
                 </div>
                 <div>
-                  <input
-                    v-model="leadForm.phone"
-                    type="tel"
-                    placeholder="Seu telefone"
-                    class="w-full px-4 py-2.5 text-sm border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500/30 text-slate-700 placeholder-slate-400"
-                  />
+                  <PhoneInput v-model="leadForm.phone" placeholder="(XX) 99999-9999" />
                 </div>
                 <div>
                   <textarea
@@ -243,6 +252,13 @@
             </div>
           </div>
         </div>
+
+        <!-- Not Found Form Section -->
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-8 mt-12">
+          <div class="lg:col-span-2">
+            <PropertyNotFoundForm :propertyId="property.id" />
+          </div>
+        </div>
       </div>
     </div>
 
@@ -270,6 +286,9 @@ const requestUrl = useRequestURL()
 const property = ref<PublicPropertyDetail | null>(null)
 const activePhoto = ref<PublicPhoto | null>(null)
 const pending = ref(true)
+
+const { toggleFavorite, isFavorited } = useLocalStorageFavorites()
+const isPropertyFavorited = ref(false)
 
 const operationLabel = (op: string) => ({ SALE: 'Venda', RENT: 'Aluguel', SEASONAL: 'Temporada' }[op] ?? op)
 const operationBg = (op: string) => ({
@@ -344,7 +363,13 @@ const fullAddress = computed(() => {
   return parts.join(', ')
 })
 
-// Lead form
+const handleFavoriteClick = () => {
+  if (property.value) {
+    const newState = toggleFavorite(property.value.id)
+    isPropertyFavorited.value = newState
+  }
+}
+
 const leadForm = ref({ name: '', email: '', phone: '', message: '' })
 const leadSubmitting = ref(false)
 const leadSuccess = ref(false)
@@ -378,6 +403,7 @@ const loadProperty = async () => {
     const id = route.params.id as string
     const data = await getProperty(resolveSlug(), id)
     property.value = data
+    isPropertyFavorited.value = isFavorited(id)
     if (data.photos && data.photos.length > 0) {
       const coverPhoto = data.photos.find((p) => p.isCover) ?? data.photos[0]
       activePhoto.value = coverPhoto
