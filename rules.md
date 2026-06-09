@@ -14,6 +14,8 @@
 | `usePublicApi()` | `composables/usePublicApi.ts` | `listProperties(slug, params)`, `getProperty(slug, id)`, `createLead(slug, data)` |
 | `useAuth()` | `composables/useAuth.ts` | Authentication state |
 | `useAuthApi()` | `composables/useAuthApi.ts` | Login/logout API calls |
+| `useLocalStorageFavorites()` | `composables/useLocalStorageFavorites.ts` | Manage favorite properties in localStorage (add, remove, toggle, check) |
+| `useCountryDDI()` | `composables/useCountryDDI.ts` | List 24 countries with DDI codes, Brazil default (+55) |
 
 ## API Endpoints Used
 - `GET /api/v1/public/config` — tenant website config (via `X-Tenant-Slug` header)
@@ -61,7 +63,10 @@ Sections (top → bottom):
 ## Components
 | Component | Purpose |
 |---|---|
-| `components/PropertyCard.vue` | Reusable property card (image bg, price overlay, operation badge, specs row). Props: `property: PublicPropertySummary` |
+| `components/PropertyCard.vue` | Reusable property card (image bg, price overlay, operation badge, specs row). Props: `property: PublicPropertySummary`. Heart button to add/remove favorites |
+| `components/FavoritesModal.vue` | Modal showing all favorited properties with remove button. Props: `isOpen: boolean`. Emits `close` event |
+| `components/PropertyNotFoundForm.vue` | "Didn't find what you're looking for?" lead form. Fields: name (required), email, phone, description (required). Props: `propertyId: string` |
+| `components/PhoneInput.vue` | Two-part phone input with country DDI selector. Props: `v-model`, `placeholder`, `required`. Default: Brazil (+55) |
 
 ---
 
@@ -104,6 +109,10 @@ await createLead(resolveSlug(), { name, email, phone, message })
 ---
 
 ## Last Changes
+- **Favorites localStorage (issue39)**: Added `useLocalStorageFavorites()` composable to persist favorites across sessions using localStorage key `rinoimob_favorites`. Heart button on PropertyCard shows filled/unfilled state. Header shows badge counter with favorites count. Created `FavoritesModal.vue` to display all favorited properties with remove functionality.
+- **PropertyNotFoundForm (issue46)**: Created `PropertyNotFoundForm.vue` component for lead capture at bottom of property detail page. Form fields: name (required), email, phone, description (required). Validates and submits to `/api/public/leads` with propertyId. Shows success/error messages and clears form after submission.
+- **DDI Phone Selector (issue44)**: Created `useCountryDDI()` composable with 24 countries (Brazil default). Created `PhoneInput.vue` component with dropdown DDI selector and phone field. Replaces phone input in property detail page. Phone field auto-formats with country code, emits formatted number (`+DD + digits`).
+- **Property detail page heart button**: Added heart button next to title in property detail page. Uses `useLocalStorageFavorites()` to toggle favorite state with visual feedback (filled red heart when favorited).
 - **Homepage visual refactor**: Rewrote `pages/index.vue` to match Figma mockup — split hero, tabbed featured section, launches, categories, services+form, stats, blog, CTA
 - **Lançamentos da home**: seção de lançamentos agora consulta `categorySlug=lancamentos` no público; links do header/footer e a listagem pública também entendem `categorySlug`. `SEASONAL` voltou a ser rotulado como `Temporada`.
 - **CMS de home**: `TenantWebsiteConfig` agora carrega títulos/subtítulos editáveis para as seções principais e `pages/index.vue` consome esses campos; `useTenantConfig` faz merge completo com defaults.
@@ -118,3 +127,4 @@ await createLead(resolveSlug(), { name, email, phone, message })
 - **Conversão de leads instrumentada**: formulários públicos enviam `source` detalhado no payload (`PORTAL_HOME_FORM` na home e `PORTAL_PROPERTY_FORM` no detalhe do imóvel), permitindo segmentação de origem diretamente no CRM de leads.
 - **SEO do website**: `layouts/default.vue` agora injeta defaults globais (lang, theme-color, og site_name, favicon). Home, listagem e detalhe têm canonical, meta OG/Twitter e JSON-LD. Também existem rotas server-side `robots.txt` e `sitemap.xml` por tenant.
 - **Blog em produção (API real)**: páginas `pages/blog/index.vue` e `pages/blog/[slug].vue` agora consomem `/api/v1/public/blog-posts` e `/api/v1/public/blog-posts/{slug}` por tenant; home também puxa os 3 posts mais recentes da API e o `sitemap.xml` inclui posts publicados retornados do backend.
+- **Lançamentos mais verticais na home**: `components/PropertyCard.vue` agora suporta `cardVariant` (`default` e `vertical`) com controle de proporção (`aspect-[4/3]` e `aspect-[4/5]`). Em `pages/index.vue`, os cards da seção de lançamentos usam `card-variant="vertical"` para aumentar a altura dos boxes.
