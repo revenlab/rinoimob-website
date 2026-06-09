@@ -20,12 +20,8 @@
             @click="showFavoritesModal = true"
             class="relative p-2 rounded-full hover:bg-slate-100 transition-colors"
           >
-            <svg v-if="favoritesCount > 0" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="w-5 h-5 text-red-500">
-              <path d="M11.645 20.745L.516 3.714A2.25 2.25 0 012.004 2.25h5.676c.54 0 1.079.176 1.519.529L12 5.863l3.01-2.554c.44-.353.979-.53 1.519-.53h5.676a2.25 2.25 0 011.488 1.464l-11.645 17.03z" />
-            </svg>
-            <svg v-else xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-5 h-5 text-slate-500">
-              <path stroke-linecap="round" stroke-linejoin="round" d="M21 8.25c0-2.485-2.099-4.5-4.688-4.5-1.935 0-3.597 1.126-4.312 2.733-.715-1.607-2.377-2.733-4.313-2.733C5.1 3.75 3 5.765 3 8.25c0 7.22 9 12 9 12s9-4.78 9-12z" />
-            </svg>
+            <HeartSolidIcon v-if="favoritesCount > 0" class="block w-4 h-4 text-red-500" />
+            <HeartOutlineIcon v-else class="w-5 h-5 text-slate-500" />
             <span v-if="favoritesCount > 0" class="absolute -top-1 -right-1 bg-red-500 text-white text-xs font-bold rounded-full w-5 h-5 flex items-center justify-center">
               {{ favoritesCount }}
             </span>
@@ -151,6 +147,8 @@
 
 <script setup lang="ts">
 import { DEFAULT_TENANT_CONFIG } from '~/types/tenant'
+import { HeartIcon as HeartOutlineIcon } from '@heroicons/vue/24/outline'
+import { HeartIcon as HeartSolidIcon } from '@heroicons/vue/24/solid'
 
 const { useTenantConfigData } = useTenantConfig()
 const { data: tenantConfig } = await useTenantConfigData()

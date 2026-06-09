@@ -16,7 +16,7 @@ const COUNTRIES: Country[] = [
   { name: 'Peru', flag: '🇵🇪', code: 'PE', ddi: '51' },
   { name: 'Paraguai', flag: '🇵🇾', code: 'PY', ddi: '595' },
   { name: 'Uruguai', flag: '🇺🇾', code: 'UY', ddi: '598' },
-  { name: 'Uruguai', flag: '🇻🇪', code: 'VE', ddi: '58' },
+  { name: 'Venezuela', flag: '🇻🇪', code: 'VE', ddi: '58' },
   { name: 'Reino Unido', flag: '🇬🇧', code: 'GB', ddi: '44' },
   { name: 'Portugal', flag: '🇵🇹', code: 'PT', ddi: '351' },
   { name: 'Espanha', flag: '🇪🇸', code: 'ES', ddi: '34' },

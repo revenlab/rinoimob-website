@@ -27,12 +27,7 @@
 
       <div>
         <label class="block text-sm font-medium text-slate-700 mb-1">Telefone</label>
-        <input
-          v-model="form.phone"
-          type="tel"
-          placeholder="(11) 99999-9999"
-          class="w-full px-4 py-2.5 text-sm border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500/30 text-slate-700 placeholder-slate-400"
-        />
+        <PhoneInput v-model="form.phone" placeholder="(11) 99999-9999" />
       </div>
 
       <div>

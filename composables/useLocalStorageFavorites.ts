@@ -1,23 +1,33 @@
 const FAVORITES_KEY = 'rinoimob_favorites'
+const FAVORITES_STATE_KEY = 'rinoimob_favorites_state'
+const FAVORITES_HYDRATED_KEY = 'rinoimob_favorites_hydrated'
 
 export function useLocalStorageFavorites() {
-  const favorites = ref<string[]>([])
+  const favorites = useState<string[]>(FAVORITES_STATE_KEY, () => [])
+  const hydrated = useState<boolean>(FAVORITES_HYDRATED_KEY, () => false)
 
   const initFavorites = () => {
     if (process.server) return
+    if (hydrated.value) return
+
     try {
       const stored = localStorage.getItem(FAVORITES_KEY)
-      favorites.value = stored ? JSON.parse(stored) : []
+      const parsed = stored ? JSON.parse(stored) : []
+
+      favorites.value = Array.isArray(parsed)
+        ? parsed.filter((value): value is string => typeof value === 'string')
+        : []
     } catch {
       favorites.value = []
+    } finally {
+      hydrated.value = true
     }
   }
 
   const getFavorites = (): string[] => {
     if (process.server) return []
-    if (favorites.value.length === 0) {
-      initFavorites()
-    }
+
+    initFavorites()
     return favorites.value
   }
 
@@ -29,7 +39,7 @@ export function useLocalStorageFavorites() {
     if (process.server) return
     const current = getFavorites()
     if (!current.includes(propertyId)) {
-      favorites.value.push(propertyId)
+      favorites.value = [...current, propertyId]
       localStorage.setItem(FAVORITES_KEY, JSON.stringify(favorites.value))
     }
   }

@@ -110,8 +110,14 @@ await createLead(resolveSlug(), { name, email, phone, message })
 
 ## Last Changes
 - **Favorites localStorage (issue39)**: Added `useLocalStorageFavorites()` composable to persist favorites across sessions using localStorage key `rinoimob_favorites`. Heart button on PropertyCard shows filled/unfilled state. Header shows badge counter with favorites count. Created `FavoritesModal.vue` to display all favorited properties with remove functionality.
+- **Favorites sync fix**: `useLocalStorageFavorites()` now keeps a shared `useState` cache so header, cards and detail pages stay in sync. `FavoritesModal.vue` loads each favorite through `usePublicApi().getProperty()` using the tenant slug instead of relying on an unsupported bulk `ids` query.
+- **Favorites heart spacing fix**: PropertyCard favorite button now uses a larger hit area (`w-11 h-11`) and a 5px icon so the filled heart is not clipped at the card corner.
+- **Favorites icons library**: Replaced inline heart SVGs with `@heroicons/vue` (`HeartIcon` solid/outline) in card, header, detail page and favorites modal for consistent rendering.
+- **Favorites modal photos fix**: Modal now resolves image with fallback order `coverPhotoUrl -> photos.isCover -> first photo`, so favorited properties display their photos reliably.
 - **PropertyNotFoundForm (issue46)**: Created `PropertyNotFoundForm.vue` component for lead capture at bottom of property detail page. Form fields: name (required), email, phone, description (required). Validates and submits to `/api/public/leads` with propertyId. Shows success/error messages and clears form after submission.
 - **DDI Phone Selector (issue44)**: Created `useCountryDDI()` composable with 24 countries (Brazil default). Created `PhoneInput.vue` component with dropdown DDI selector and phone field. Replaces phone input in property detail page. Phone field auto-formats with country code, emits formatted number (`+DD + digits`).
+- **DDI applied in all website forms**: `PhoneInput` now also powers the homepage services form (`pages/index.vue`) and the "Não encontrou o que procura?" form (`components/PropertyNotFoundForm.vue`), not only the property detail sidebar.
+- **DDI countries data fix**: Corrected country label for `VE +58` from "Uruguai" to "Venezuela" in `useCountryDDI.ts`.
 - **Property detail page heart button**: Added heart button next to title in property detail page. Uses `useLocalStorageFavorites()` to toggle favorite state with visual feedback (filled red heart when favorited).
 - **Homepage visual refactor**: Rewrote `pages/index.vue` to match Figma mockup — split hero, tabbed featured section, launches, categories, services+form, stats, blog, CTA
 - **Lançamentos da home**: seção de lançamentos agora consulta `categorySlug=lancamentos` no público; links do header/footer e a listagem pública também entendem `categorySlug`. `SEASONAL` voltou a ser rotulado como `Temporada`.

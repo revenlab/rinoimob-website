@@ -39,15 +39,19 @@
           </NuxtLink>
         </div>
 
-        <div v-else class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+        <div v-else-if="loading" class="flex justify-center py-12">
+          <div class="w-8 h-8 rounded-full border-2 border-t-transparent animate-spin" :style="{ borderColor: cfg.primaryColor + '40', borderTopColor: 'transparent' }"></div>
+        </div>
+
+        <div v-else-if="properties.length" class="grid grid-cols-1 sm:grid-cols-2 gap-4">
           <div v-for="property in properties" :key="property.id" class="rounded-xl overflow-hidden bg-slate-50 hover:shadow-lg transition-shadow">
             <NuxtLink
               :to="`/imoveis/${property.id}`"
               class="block aspect-[4/3] overflow-hidden bg-slate-100 relative group"
             >
               <img
-                v-if="property.coverPhotoUrl"
-                :src="property.coverPhotoUrl"
+                v-if="getPropertyImageUrl(property)"
+                :src="getPropertyImageUrl(property)!"
                 :alt="property.title"
                 class="w-full h-full object-cover group-hover:scale-105 transition-transform"
               />
@@ -74,13 +78,16 @@
                   class="p-1.5 hover:bg-red-50 rounded-full transition-colors"
                   aria-label="Remover dos favoritos"
                 >
-                  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="w-4 h-4 text-red-500">
-                    <path d="M11.645 20.745L.516 3.714A2.25 2.25 0 012.004 2.25h5.676c.54 0 1.079.176 1.519.529L12 5.863l3.01-2.554c.44-.353.979-.53 1.519-.53h5.676a2.25 2.25 0 011.488 1.464l-11.645 17.03z" />
-                  </svg>
+                  <HeartSolidIcon class="w-4 h-4 text-red-500" />
                 </button>
               </div>
             </div>
           </div>
+        </div>
+
+        <div v-else class="text-center py-12">
+          <p class="text-slate-500 text-lg">Não foi possível carregar seus favoritos</p>
+          <p class="text-slate-400 text-sm mt-2">Tente abrir o modal novamente.</p>
         </div>
       </div>
     </div>
@@ -89,7 +96,8 @@
 
 <script setup lang="ts">
 import { DEFAULT_TENANT_CONFIG } from '~/types/tenant'
-import type { PublicPropertySummary } from '~/types/property'
+import type { PublicPropertyDetail } from '~/types/property'
+import { HeartIcon as HeartSolidIcon } from '@heroicons/vue/24/solid'
 
 const props = defineProps<{
   isOpen: boolean
@@ -100,11 +108,13 @@ const emit = defineEmits<{
 }>()
 
 const { useTenantConfigData } = useTenantConfig()
+const { resolveSlug } = useTenantConfig()
 const { data: tenantConfig } = await useTenantConfigData()
 const cfg = computed(() => ({ ...DEFAULT_TENANT_CONFIG, ...(tenantConfig.value ?? {}) }))
+const { getProperty } = usePublicApi()
 
 const { favorites, removeFavorite } = useLocalStorageFavorites()
-const properties = ref<PublicPropertySummary[]>([])
+const properties = ref<PublicPropertyDetail[]>([])
 const loading = ref(false)
 
 const fetchProperties = async () => {
@@ -115,12 +125,18 @@ const fetchProperties = async () => {
 
   loading.value = true
   try {
-    const { data } = await $fetch<{ data: PublicPropertySummary[] }>('/api/properties', {
-      query: {
-        ids: favorites.value.join(','),
-      },
-    })
-    properties.value = data || []
+    const tenantSlug = resolveSlug()
+    const results = await Promise.all(
+      favorites.value.map(async (propertyId) => {
+        try {
+          return await getProperty(tenantSlug, propertyId)
+        } catch {
+          return null
+        }
+      })
+    )
+
+    properties.value = results.filter((property): property is PublicPropertyDetail => property !== null)
   } catch (error) {
     console.error('Failed to fetch favorites:', error)
     properties.value = []
@@ -135,10 +151,12 @@ const handleRemoveFavorite = (propertyId: string) => {
 }
 
 watch(
-  () => props.isOpen,
-  async (newVal) => {
-    if (newVal) {
+  () => [props.isOpen, favorites.value.join(',')],
+  async ([isOpen]) => {
+    if (isOpen) {
       await fetchProperties()
+    } else {
+      properties.value = []
     }
   }
 )
@@ -149,6 +167,19 @@ const formattedPrice = (price: number, currency?: string) => {
     currency: currency || 'BRL',
     maximumFractionDigits: 0,
   }).format(price)
+}
+
+const getPropertyImageUrl = (property: PublicPropertyDetail): string | null => {
+  if (property.coverPhotoUrl) {
+    return property.coverPhotoUrl
+  }
+
+  const coverFromPhotos = property.photos?.find(photo => photo.isCover)?.url
+  if (coverFromPhotos) {
+    return coverFromPhotos
+  }
+
+  return property.photos?.[0]?.url ?? null
 }
 
 const close = () => {

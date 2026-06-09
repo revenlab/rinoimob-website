@@ -282,6 +282,7 @@
                   v-for="p in page"
                   :key="p.id"
                   :property="p"
+                  card-variant="vertical"
                 />
               </div>
             </div>
@@ -387,12 +388,9 @@
                 placeholder="Seu e-mail"
                 class="w-full px-4 py-3 rounded-xl bg-white/10 border border-white/20 text-white placeholder-white/40 text-sm focus:outline-none focus:border-white/50 transition-colors"
               />
-              <input
-                v-model="leadForm.phone"
-                type="tel"
-                placeholder="WhatsApp com DDD"
-                class="w-full px-4 py-3 rounded-xl bg-white/10 border border-white/20 text-white placeholder-white/40 text-sm focus:outline-none focus:border-white/50 transition-colors"
-              />
+              <div class="[&>div>button]:bg-white/10 [&>div>button]:border-white/20 [&>div>button]:text-white [&>div>button]:hover:bg-white/20 [&>div>button_span.text-slate-500]:text-white/70 [&>div>input]:bg-white/10 [&>div>input]:border-white/20 [&>div>input]:text-white [&>div>input]:placeholder-white/40 [&>div>input]:focus:border-white/50">
+                <PhoneInput v-model="leadForm.phone" placeholder="WhatsApp com DDD" />
+              </div>
               <button
                 type="submit"
                 :disabled="leadSubmitting || leadSent"
