@@ -22,6 +22,9 @@ export const usePublicApi = () => {
       maxPrice?: string | number
       bedrooms?: string | number
       city?: string
+      latitude?: string | number
+      longitude?: string | number
+      radiusKm?: string | number
     } = {}
   ): Promise<PageResponse<PublicPropertySummary>> => {
     const query = new URLSearchParams()
@@ -35,6 +38,9 @@ export const usePublicApi = () => {
     if (params.maxPrice) query.set('maxPrice', String(params.maxPrice))
     if (params.bedrooms != null && params.bedrooms !== '') query.set('bedrooms', String(params.bedrooms))
     if (params.city) query.set('city', params.city)
+    if (params.latitude != null && params.latitude !== '') query.set('latitude', String(params.latitude))
+    if (params.longitude != null && params.longitude !== '') query.set('longitude', String(params.longitude))
+    if (params.radiusKm != null && params.radiusKm !== '') query.set('radiusKm', String(params.radiusKm))
     const qs = query.toString()
     return $fetch(`${API_BASE}/properties${qs ? `?${qs}` : ''}`, {
       headers: getHeaders(tenantSlug),

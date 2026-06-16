@@ -139,3 +139,6 @@ await createLead(resolveSlug(), { name, email, phone, message })
   - `composables/usePublicApi.ts` agora aceita também `q` (busca textual) além dos filtros numéricos.
   - `pages/imoveis/index.vue` ganhou barra de filtros mais completa com `q`, `city`, `propertyType`, `minPrice`, `maxPrice` e `bedrooms`.
   - Estado/URL dos filtros foi atualizado para preservar `q`, `minPrice` e `bedrooms` no query string e no reset de filtros.
+- **Geospatial/caching no catálogo público (#22)**:
+  - `usePublicApi.listProperties()` agora também serializa `latitude`, `longitude` e `radiusKm` quando presentes.
+  - `pages/imoveis/index.vue` preserva esses parâmetros no estado e na URL para permitir links de busca por localização.

@@ -187,6 +187,9 @@ const filters = ref({
   minPrice: (route.query.minPrice as string) || '',
   maxPrice: (route.query.maxPrice as string) || '',
   bedrooms: (route.query.bedrooms as string) || '',
+  latitude: (route.query.latitude as string) || '',
+  longitude: (route.query.longitude as string) || '',
+  radiusKm: (route.query.radiusKm as string) || '',
 })
 const currentPage = ref(Number(route.query.page) > 1 ? Number(route.query.page) - 1 : 0)
 const totalPages = ref(1)
@@ -203,7 +206,10 @@ const hasActiveFilters = computed(() =>
     filters.value.city ||
     filters.value.minPrice ||
     filters.value.maxPrice ||
-    filters.value.bedrooms
+    filters.value.bedrooms ||
+    filters.value.latitude ||
+    filters.value.longitude ||
+    filters.value.radiusKm
   )
 )
 
@@ -259,6 +265,9 @@ const syncUrl = () => {
   if (filters.value.minPrice) query.minPrice = filters.value.minPrice
   if (filters.value.maxPrice) query.maxPrice = filters.value.maxPrice
   if (filters.value.bedrooms) query.bedrooms = filters.value.bedrooms
+  if (filters.value.latitude) query.latitude = filters.value.latitude
+  if (filters.value.longitude) query.longitude = filters.value.longitude
+  if (filters.value.radiusKm) query.radiusKm = filters.value.radiusKm
   if (currentPage.value > 0) query.page = String(currentPage.value + 1)
   router.replace({ query })
 }
@@ -277,6 +286,9 @@ const loadProperties = async () => {
       minPrice: filters.value.minPrice || undefined,
       maxPrice: filters.value.maxPrice || undefined,
       bedrooms: filters.value.bedrooms || undefined,
+      latitude: filters.value.latitude || undefined,
+      longitude: filters.value.longitude || undefined,
+      radiusKm: filters.value.radiusKm || undefined,
     })
     properties.value = data.content
     totalPages.value = data.totalPages
@@ -306,7 +318,19 @@ const goToPage = (page: number) => {
 }
 
 const clearFilters = () => {
-  filters.value = { operation: '', propertyType: '', categorySlug: '', q: '', city: '', minPrice: '', maxPrice: '', bedrooms: '' }
+  filters.value = {
+    operation: '',
+    propertyType: '',
+    categorySlug: '',
+    q: '',
+    city: '',
+    minPrice: '',
+    maxPrice: '',
+    bedrooms: '',
+    latitude: '',
+    longitude: '',
+    radiusKm: '',
+  }
   applyFilters()
 }
 
