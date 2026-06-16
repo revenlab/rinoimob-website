@@ -22,13 +22,20 @@
         </div>
 
         <!-- Secondary filters row -->
-        <div class="flex flex-col sm:flex-row gap-2 items-stretch sm:items-center">
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-7 gap-2 items-stretch">
+          <input
+            v-model="filters.q"
+            type="text"
+            placeholder="Buscar por título, bairro ou código"
+            @keyup.enter="applyFilters"
+            class="px-4 py-2.5 text-sm text-slate-700 placeholder-slate-400 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500/30 lg:col-span-2"
+          />
           <input
             v-model="filters.city"
             type="text"
             placeholder="Cidade"
             @keyup.enter="applyFilters"
-            class="flex-1 min-w-0 px-4 py-2.5 text-sm text-slate-700 placeholder-slate-400 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500/30"
+            class="px-4 py-2.5 text-sm text-slate-700 placeholder-slate-400 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500/30"
           />
           <select v-model="filters.propertyType" @change="applyFilters"
             class="px-3 py-2.5 text-sm border border-slate-200 rounded-xl bg-white text-slate-700 focus:outline-none focus:ring-2 focus:ring-blue-500/30">
@@ -39,12 +46,27 @@
             <option value="COMMERCIAL">Comercial</option>
             <option value="RURAL">Rural</option>
           </select>
+          <select v-model="filters.minPrice" @change="applyFilters"
+            class="px-3 py-2.5 text-sm border border-slate-200 rounded-xl bg-white text-slate-700 focus:outline-none focus:ring-2 focus:ring-blue-500/30">
+            <option value="">Preço mín.</option>
+            <option value="200000">A partir de R$200k</option>
+            <option value="500000">A partir de R$500k</option>
+            <option value="1000000">A partir de R$1M</option>
+          </select>
           <select v-model="filters.maxPrice" @change="applyFilters"
             class="px-3 py-2.5 text-sm border border-slate-200 rounded-xl bg-white text-slate-700 focus:outline-none focus:ring-2 focus:ring-blue-500/30">
             <option value="">Sem limite</option>
             <option value="500000">Até R$500k</option>
             <option value="1000000">R$500k – 1M</option>
             <option value="2000000">R$1M – 2M</option>
+          </select>
+          <select v-model="filters.bedrooms" @change="applyFilters"
+            class="px-3 py-2.5 text-sm border border-slate-200 rounded-xl bg-white text-slate-700 focus:outline-none focus:ring-2 focus:ring-blue-500/30">
+            <option value="">Quartos</option>
+            <option value="1">1+ quarto</option>
+            <option value="2">2+ quartos</option>
+            <option value="3">3+ quartos</option>
+            <option value="4">4+ quartos</option>
           </select>
           <button @click="applyFilters"
             class="px-6 py-2.5 text-sm font-semibold text-white rounded-xl transition-colors shrink-0"
@@ -137,6 +159,7 @@ const listDescription = computed(() => {
   if (hasActiveFilters.value) {
     const parts = [
       filters.value.operation ? `operação ${filters.value.operation.toLowerCase()}` : '',
+      filters.value.q ? `busca "${filters.value.q}"` : '',
       filters.value.propertyType ? `tipo ${filters.value.propertyType.toLowerCase()}` : '',
       filters.value.city ? `em ${filters.value.city}` : '',
     ].filter(Boolean).join(' ')
@@ -159,8 +182,11 @@ const filters = ref({
   operation: (route.query.operation as string) || '',
   propertyType: (route.query.propertyType as string) || '',
   categorySlug: (route.query.categorySlug as string) || '',
+  q: (route.query.q as string) || '',
   city: (route.query.city as string) || '',
+  minPrice: (route.query.minPrice as string) || '',
   maxPrice: (route.query.maxPrice as string) || '',
+  bedrooms: (route.query.bedrooms as string) || '',
 })
 const currentPage = ref(Number(route.query.page) > 1 ? Number(route.query.page) - 1 : 0)
 const totalPages = ref(1)
@@ -169,7 +195,16 @@ const properties = ref<PublicPropertySummary[]>([])
 const pending = ref(true)
 
 const hasActiveFilters = computed(() =>
-  !!(filters.value.operation || filters.value.propertyType || filters.value.categorySlug || filters.value.city || filters.value.maxPrice)
+  !!(
+    filters.value.operation ||
+    filters.value.propertyType ||
+    filters.value.categorySlug ||
+    filters.value.q ||
+    filters.value.city ||
+    filters.value.minPrice ||
+    filters.value.maxPrice ||
+    filters.value.bedrooms
+  )
 )
 
 const visiblePages = computed(() => {
@@ -219,8 +254,11 @@ const syncUrl = () => {
   if (filters.value.operation) query.operation = filters.value.operation
   if (filters.value.propertyType) query.propertyType = filters.value.propertyType
   if (filters.value.categorySlug) query.categorySlug = filters.value.categorySlug
+  if (filters.value.q) query.q = filters.value.q
   if (filters.value.city) query.city = filters.value.city
+  if (filters.value.minPrice) query.minPrice = filters.value.minPrice
   if (filters.value.maxPrice) query.maxPrice = filters.value.maxPrice
+  if (filters.value.bedrooms) query.bedrooms = filters.value.bedrooms
   if (currentPage.value > 0) query.page = String(currentPage.value + 1)
   router.replace({ query })
 }
@@ -234,8 +272,11 @@ const loadProperties = async () => {
       operation: filters.value.operation || undefined,
       propertyType: filters.value.propertyType || undefined,
       categorySlug: filters.value.categorySlug || undefined,
+      q: filters.value.q || undefined,
       city: filters.value.city || undefined,
+      minPrice: filters.value.minPrice || undefined,
       maxPrice: filters.value.maxPrice || undefined,
+      bedrooms: filters.value.bedrooms || undefined,
     })
     properties.value = data.content
     totalPages.value = data.totalPages
@@ -265,7 +306,7 @@ const goToPage = (page: number) => {
 }
 
 const clearFilters = () => {
-  filters.value = { operation: '', propertyType: '', categorySlug: '', city: '', maxPrice: '' }
+  filters.value = { operation: '', propertyType: '', categorySlug: '', q: '', city: '', minPrice: '', maxPrice: '', bedrooms: '' }
   applyFilters()
 }
 

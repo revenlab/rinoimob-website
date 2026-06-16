@@ -11,7 +11,18 @@ export const usePublicApi = () => {
 
   const listProperties = async (
     tenantSlug: string,
-    params: { page?: number; size?: number; operation?: string; propertyType?: string; categorySlug?: string; maxPrice?: string | number; city?: string } = {}
+    params: {
+      page?: number
+      size?: number
+      operation?: string
+      propertyType?: string
+      categorySlug?: string
+      q?: string
+      minPrice?: string | number
+      maxPrice?: string | number
+      bedrooms?: string | number
+      city?: string
+    } = {}
   ): Promise<PageResponse<PublicPropertySummary>> => {
     const query = new URLSearchParams()
     if (params.page != null) query.set('page', String(params.page))
@@ -19,7 +30,10 @@ export const usePublicApi = () => {
     if (params.operation) query.set('operation', params.operation)
     if (params.propertyType) query.set('propertyType', params.propertyType)
     if (params.categorySlug) query.set('categorySlug', params.categorySlug)
+    if (params.q) query.set('q', params.q)
+    if (params.minPrice != null && params.minPrice !== '') query.set('minPrice', String(params.minPrice))
     if (params.maxPrice) query.set('maxPrice', String(params.maxPrice))
+    if (params.bedrooms != null && params.bedrooms !== '') query.set('bedrooms', String(params.bedrooms))
     if (params.city) query.set('city', params.city)
     const qs = query.toString()
     return $fetch(`${API_BASE}/properties${qs ? `?${qs}` : ''}`, {

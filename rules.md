@@ -134,3 +134,8 @@ await createLead(resolveSlug(), { name, email, phone, message })
 - **SEO do website**: `layouts/default.vue` agora injeta defaults globais (lang, theme-color, og site_name, favicon). Home, listagem e detalhe têm canonical, meta OG/Twitter e JSON-LD. Também existem rotas server-side `robots.txt` e `sitemap.xml` por tenant.
 - **Blog em produção (API real)**: páginas `pages/blog/index.vue` e `pages/blog/[slug].vue` agora consomem `/api/v1/public/blog-posts` e `/api/v1/public/blog-posts/{slug}` por tenant; home também puxa os 3 posts mais recentes da API e o `sitemap.xml` inclui posts publicados retornados do backend.
 - **Lançamentos mais verticais na home**: `components/PropertyCard.vue` agora suporta `cardVariant` (`default` e `vertical`) com controle de proporção (`aspect-[4/3]` e `aspect-[4/5]`). Em `pages/index.vue`, os cards da seção de lançamentos usam `card-variant="vertical"` para aumentar a altura dos boxes.
+- **Filtros públicos alinhados com backend (#22)**: `composables/usePublicApi.ts` (`listProperties`) passou a aceitar também `minPrice` e `bedrooms` além de `maxPrice`/`city`/`operation`/`propertyType`/`categorySlug`, serializando esses params para `/api/v1/public/properties`.
+- **Busca e filtros expandidos na listagem pública (#22)**:
+  - `composables/usePublicApi.ts` agora aceita também `q` (busca textual) além dos filtros numéricos.
+  - `pages/imoveis/index.vue` ganhou barra de filtros mais completa com `q`, `city`, `propertyType`, `minPrice`, `maxPrice` e `bedrooms`.
+  - Estado/URL dos filtros foi atualizado para preservar `q`, `minPrice` e `bedrooms` no query string e no reset de filtros.

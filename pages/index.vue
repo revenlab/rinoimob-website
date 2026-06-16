@@ -650,7 +650,7 @@ useHead(computed(() => ({
           url: homepageCanonical.value,
           potentialAction: {
             '@type': 'SearchAction',
-            target: `${requestUrl.origin}/imoveis?city={search_term_string}`,
+            target: `${requestUrl.origin}/imoveis?q={search_term_string}`,
             'query-input': 'required name=search_term_string',
           },
         },
@@ -677,7 +677,7 @@ const doSearch = () => {
   router.push({
     path: '/imoveis',
     query: {
-      ...(searchQuery.value ? { city: searchQuery.value } : {}),
+      ...(searchQuery.value ? { q: searchQuery.value } : {}),
       ...(searchType.value ? { propertyType: searchType.value } : {}),
     },
   })
