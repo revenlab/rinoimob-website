@@ -67,9 +67,10 @@ const props = defineProps<{
   propertyId: string
 }>()
 
-const { useTenantConfigData } = useTenantConfig()
+const { useTenantConfigData, resolveSlug } = useTenantConfig()
 const { data: tenantConfig } = await useTenantConfigData()
 const cfg = computed(() => ({ ...DEFAULT_TENANT_CONFIG, ...(tenantConfig.value ?? {}) }))
+const { getProperty, createLead } = usePublicApi()
 
 const form = ref({
   name: '',
@@ -93,15 +94,13 @@ const submitForm = async () => {
   successMessage.value = ''
 
   try {
-    await $fetch('/api/public/leads', {
-      method: 'POST',
-      body: {
-        name: form.value.name,
-        email: form.value.email,
-        phone: form.value.phone,
-        message: form.value.description,
-        propertyId: props.propertyId,
-      },
+    await createLead(resolveSlug(),{
+      name: form.value.name,
+      email: form.value.email,
+      phone: form.value.phone,
+      message: form.value.description,
+      propertyId: props.propertyId,
+      source: 'PORTAL_PROPERTY_NOT_FOUND_FORM',
     })
 
     successMessage.value = 'Mensagem enviada com sucesso! Logo entraremos em contato.'

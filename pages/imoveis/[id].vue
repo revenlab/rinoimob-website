@@ -238,12 +238,12 @@
                   </svg>
                   Falar no WhatsApp
                 </a>
-                <button
+                <!-- <button
                   class="w-full py-3 text-sm font-semibold rounded-xl border transition-colors hover:bg-blue-50"
                   :style="{ color: cfg.primaryColor, borderColor: cfg.primaryColor }"
                 >
                   Simular Pagamento
-                </button>
+                </button> -->
               </div>
             </div>
           </div>
