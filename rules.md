@@ -6,6 +6,7 @@
 - **State**: `ref`/`computed` via Vue 3 Composition API
 - **HTTP**: `$fetch` via Nuxt (no axios)
 - **Routing**: File-based (`pages/`)
+- **Validation**: ignore frontend type-check commands by default; use `npm run build` unless explicitly asked otherwise.
 
 ## Key Composables
 | Composable | Location | Purpose |
@@ -143,3 +144,4 @@ await createLead(resolveSlug(), { name, email, phone, message })
 - **Geospatial/caching no catálogo público (#22)**:
   - `usePublicApi.listProperties()` agora também serializa `latitude`, `longitude` e `radiusKm` quando presentes.
   - `pages/imoveis/index.vue` preserva esses parâmetros no estado e na URL para permitir links de busca por localização.
+- **Plantas públicas no detalhe (#41)**: `types/property.ts` agora modela `floorPlans` no contrato público; `pages/imoveis/[id].vue` renderiza a seção "Plantas" entre descrição e comodidades, com imagem destacada (`isCover`/`position === 0`) e grade responsiva para fotos adicionais.

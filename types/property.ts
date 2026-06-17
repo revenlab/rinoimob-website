@@ -29,6 +29,7 @@ export interface PublicPropertyDetail extends PublicPropertySummary {
   lat: number | null
   lng: number | null
   photos: PublicPhoto[]
+  floorPlans: PublicFloorPlan[]
   amenities: PublicAmenity[]
   categories: PublicCategory[]
 }
@@ -39,6 +40,20 @@ export interface PublicPhoto {
   position: number
   isCover: boolean
   altText: string | null
+}
+
+export interface PublicFloorPlanPhoto {
+  id: string
+  url: string
+  position: number | null
+  isCover: boolean | null
+}
+
+export interface PublicFloorPlan {
+  id: string
+  name: string
+  area: number | null
+  photos: PublicFloorPlanPhoto[]
 }
 
 export interface PublicAmenity {

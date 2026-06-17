@@ -140,6 +140,61 @@
               <p class="text-slate-600 text-sm leading-relaxed whitespace-pre-line">{{ property.description }}</p>
             </div>
 
+            <!-- Floor Plans -->
+            <div v-if="floorPlansToDisplay.length" class="bg-white rounded-2xl p-5 shadow-sm">
+              <div class="flex items-center justify-between gap-3 mb-5">
+                <h2 class="font-semibold text-[#1e2d4d]">Plantas</h2>
+                <span class="text-xs font-semibold px-3 py-1 rounded-full bg-slate-100 text-slate-500">
+                  {{ floorPlansToDisplay.length }} {{ floorPlansToDisplay.length === 1 ? 'planta' : 'plantas' }}
+                </span>
+              </div>
+
+              <div class="space-y-6">
+                <article
+                  v-for="plan in floorPlansToDisplay"
+                  :key="plan.id"
+                  class="rounded-2xl border border-slate-100 bg-slate-50/70 p-4"
+                >
+                  <div class="flex flex-wrap items-center gap-2 mb-4">
+                    <h3 class="font-semibold text-slate-800">{{ plan.name }}</h3>
+                    <span
+                      v-if="plan.area"
+                      class="text-xs font-semibold px-2.5 py-1 rounded-full"
+                      :style="{ color: brandPrimaryColor, backgroundColor: `${brandPrimaryColor}12` }"
+                    >
+                      {{ formatArea(plan.area) }}m²
+                    </span>
+                  </div>
+
+                  <div v-if="plan.coverPhoto" class="space-y-3">
+                    <div class="overflow-hidden rounded-xl bg-white border border-slate-100">
+                      <img
+                        :src="plan.coverPhoto.url"
+                        :alt="plan.name"
+                        class="w-full max-h-[520px] object-contain bg-white"
+                        loading="lazy"
+                      />
+                    </div>
+
+                    <div v-if="plan.additionalPhotos.length" class="grid grid-cols-2 sm:grid-cols-3 gap-3">
+                      <div
+                        v-for="photo in plan.additionalPhotos"
+                        :key="photo.id"
+                        class="aspect-[4/3] overflow-hidden rounded-xl bg-white border border-slate-100"
+                      >
+                        <img
+                          :src="photo.url"
+                          :alt="plan.name"
+                          class="w-full h-full object-cover"
+                          loading="lazy"
+                        />
+                      </div>
+                    </div>
+                  </div>
+                </article>
+              </div>
+            </div>
+
             <!-- Amenities -->
             <div v-if="property.amenities && property.amenities.length" class="bg-white rounded-2xl p-5 shadow-sm">
               <h2 class="font-semibold text-[#1e2d4d] mb-4">Comodidades</h2>
@@ -267,10 +322,18 @@
 </template>
 
 <script setup lang="ts">
-import type { PublicPropertyDetail, PublicPhoto } from '~/types/property'
+import type { PublicFloorPlanPhoto, PublicPropertyDetail, PublicPhoto } from '~/types/property'
 import { DEFAULT_TENANT_CONFIG } from '~/types/tenant'
 import { HeartIcon as HeartOutlineIcon } from '@heroicons/vue/24/outline'
 import { HeartIcon as HeartSolidIcon } from '@heroicons/vue/24/solid'
+
+type FloorPlanDisplay = {
+  id: string
+  name: string
+  area: number | null
+  coverPhoto: PublicFloorPlanPhoto | null
+  additionalPhotos: PublicFloorPlanPhoto[]
+}
 
 definePageMeta({ layout: 'default' })
 
@@ -279,6 +342,7 @@ const { getProperty, createLead } = usePublicApi()
 const { resolveSlug, useTenantConfigData } = useTenantConfig()
 const { data: tenantConfig } = await useTenantConfigData()
 const cfg = computed(() => ({ ...DEFAULT_TENANT_CONFIG, ...(tenantConfig.value ?? {}) }))
+const brandPrimaryColor = computed(() => cfg.value.primaryColor ?? '#1e2d4d')
 const requestUrl = useRequestURL()
 
 const property = ref<PublicPropertyDetail | null>(null)
@@ -300,6 +364,9 @@ const typeLabel = (t: string) => ({
 
 const formatPrice = (price: number, currency: string) =>
   new Intl.NumberFormat('pt-BR', { style: 'currency', currency: currency || 'BRL', maximumFractionDigits: 0 }).format(price)
+
+const formatArea = (area: number) =>
+  new Intl.NumberFormat('pt-BR', { maximumFractionDigits: 2 }).format(area)
 
 const buildPropertyDescription = (item: PublicPropertyDetail | null) => {
   if (!item) return 'Veja os detalhes do imóvel disponível.'
@@ -360,6 +427,26 @@ const fullAddress = computed(() => {
   ].filter(Boolean)
   return parts.join(', ')
 })
+
+const sortFloorPlanPhotos = (photos: PublicFloorPlanPhoto[]) =>
+  [...photos].sort((a, b) => (a.position ?? Number.MAX_SAFE_INTEGER) - (b.position ?? Number.MAX_SAFE_INTEGER))
+
+const floorPlansToDisplay = computed<FloorPlanDisplay[]>(() =>
+  property.value?.floorPlans
+    ?.map((plan) => {
+      const photos = sortFloorPlanPhotos(plan.photos ?? [])
+      const coverPhoto = photos.find((photo) => photo.isCover || photo.position === 0) ?? photos[0] ?? null
+      const additionalPhotos = coverPhoto ? photos.filter((photo) => photo.id !== coverPhoto.id) : []
+
+      return {
+        id: plan.id,
+        name: plan.name,
+        area: plan.area,
+        coverPhoto,
+        additionalPhotos,
+      }
+    }) ?? []
+)
 
 const handleFavoriteClick = () => {
   if (property.value) {
