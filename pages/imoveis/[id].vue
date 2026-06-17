@@ -140,6 +140,46 @@
               <p class="text-slate-600 text-sm leading-relaxed whitespace-pre-line">{{ property.description }}</p>
             </div>
 
+            <!-- Videos -->
+            <div v-if="videosToDisplay.length" class="bg-white rounded-2xl p-5 shadow-sm">
+              <div class="flex items-center justify-between gap-3 mb-5">
+                <h2 class="font-semibold text-[#1e2d4d]">Vídeos</h2>
+                <span class="text-xs font-semibold px-3 py-1 rounded-full bg-slate-100 text-slate-500">
+                  {{ videosToDisplay.length }} {{ videosToDisplay.length === 1 ? 'vídeo' : 'vídeos' }}
+                </span>
+              </div>
+
+              <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <article
+                  v-for="video in videosToDisplay"
+                  :key="video.id"
+                  class="overflow-hidden rounded-2xl border border-slate-100 bg-slate-50"
+                >
+                  <div class="aspect-video bg-black">
+                    <iframe
+                      v-if="video.source === 'YOUTUBE'"
+                      :src="video.url"
+                      :title="video.title || 'Vídeo do imóvel'"
+                      class="w-full h-full border-0"
+                      loading="lazy"
+                      allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                      allowfullscreen
+                    ></iframe>
+                    <video
+                      v-else
+                      :src="video.url"
+                      class="w-full h-full object-contain"
+                      controls
+                      preload="metadata"
+                    ></video>
+                  </div>
+                  <div v-if="video.title" class="p-3">
+                    <p class="text-sm font-semibold text-slate-700">{{ video.title }}</p>
+                  </div>
+                </article>
+              </div>
+            </div>
+
             <!-- Location -->
             <div v-if="hasLocation" class="bg-white rounded-2xl p-5 shadow-sm">
               <div class="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-3 mb-4">
@@ -498,6 +538,10 @@ const floorPlansToDisplay = computed<FloorPlanDisplay[]>(() =>
         additionalPhotos,
       }
     }) ?? []
+)
+
+const videosToDisplay = computed(() =>
+  [...(property.value?.videos ?? [])].sort((a, b) => (a.position ?? 0) - (b.position ?? 0))
 )
 
 const handleFavoriteClick = () => {

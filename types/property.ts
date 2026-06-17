@@ -1,6 +1,7 @@
 export type PropertyOperation = 'SALE' | 'RENT' | 'SEASONAL'
 export type PropertyType = 'HOUSE' | 'APARTMENT' | 'LAND' | 'COMMERCIAL' | 'RURAL'
 export type PropertyStatus = 'DRAFT' | 'ACTIVE' | 'RESERVED' | 'SOLD' | 'ARCHIVED'
+export type PropertyVideoSource = 'UPLOAD' | 'YOUTUBE'
 
 export interface PublicPropertySummary {
   id: string
@@ -30,6 +31,7 @@ export interface PublicPropertyDetail extends PublicPropertySummary {
   lng: number | null
   photos: PublicPhoto[]
   floorPlans: PublicFloorPlan[]
+  videos: PublicPropertyVideo[]
   amenities: PublicAmenity[]
   categories: PublicCategory[]
 }
@@ -54,6 +56,15 @@ export interface PublicFloorPlan {
   name: string
   area: number | null
   photos: PublicFloorPlanPhoto[]
+}
+
+export interface PublicPropertyVideo {
+  id: string
+  source: PropertyVideoSource
+  url: string
+  youtubeVideoId: string | null
+  title: string | null
+  position: number | null
 }
 
 export interface PublicAmenity {

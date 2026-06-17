@@ -110,6 +110,7 @@ await createLead(resolveSlug(), { name, email, phone, message })
 ---
 
 ## Last Changes
+- **Vídeos públicos em imóveis (#47)**: `types/property.ts` modela `videos` no detalhe público; `pages/imoveis/[id].vue` renderiza seção "Vídeos" com iframe para `YOUTUBE` e `<video controls>` para uploads.
 - Detalhe público do imóvel: seção "Localização" usa Google Maps por iframe sem API key, priorizando `lat`/`lng` quando cadastrados e caindo para endereço formatado quando não houver coordenadas.
 - **MVP Pendência 1 / DDI revalidation (issue44)**: `PhoneInput.vue` now mirrors the app behavior for DDI state: detects the country from an existing `+DDI` model value, re-emits the phone when the selected country changes, emits an empty string when cleared, and uses an explicit outside-click listener instead of `@click.outside`.
 - **Favorites localStorage (issue39)**: Added `useLocalStorageFavorites()` composable to persist favorites across sessions using localStorage key `rinoimob_favorites`. Heart button on PropertyCard shows filled/unfilled state. Header shows badge counter with favorites count. Created `FavoritesModal.vue` to display all favorited properties with remove functionality.
