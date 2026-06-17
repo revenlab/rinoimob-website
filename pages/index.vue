@@ -323,7 +323,7 @@
         >
           <div
             class="absolute inset-0 transition-transform duration-300 group-hover:scale-105"
-            :style="{ background: cat.gradient }"
+            :style="categoryCardStyle(cat)"
           ></div>
           <div class="absolute inset-0 bg-black/30 group-hover:bg-black/40 transition-colors"></div>
           <div class="absolute inset-0 flex flex-col justify-end p-4">
@@ -786,8 +786,35 @@ const categories = computed(() => propertyTypes.value.map((type) => {
     ...fallback,
     type: type.code,
     label: type.label,
+    cardColor: type.cardColor,
+    coverImageUrl: type.coverImageUrl,
   }
 }))
+
+function categoryCardStyle(cat: { coverImageUrl?: string | null; cardColor?: string | null; gradient: string }) {
+  if (cat.coverImageUrl) {
+    return {
+      backgroundImage: `linear-gradient(180deg, rgba(15, 23, 42, 0.12) 0%, rgba(15, 23, 42, 0.72) 100%), url(${cat.coverImageUrl})`,
+      backgroundSize: 'cover',
+      backgroundPosition: 'center',
+    }
+  }
+
+  if (cat.cardColor) {
+    return {
+      background: `linear-gradient(135deg, ${cat.cardColor} 0%, ${withOpacity(cat.cardColor, 0.7)} 100%)`,
+    }
+  }
+
+  return { background: cat.gradient }
+}
+
+function withOpacity(hex: string, opacity: number) {
+  const clean = hex.replace('#', '')
+  if (clean.length !== 6) return hex
+  const alpha = Math.round(opacity * 255).toString(16).padStart(2, '0')
+  return `#${clean}${alpha}`.toUpperCase()
+}
 
 const services = [
   {

@@ -110,6 +110,7 @@ await createLead(resolveSlug(), { name, email, phone, message })
 ---
 
 ## Last Changes
+- **Cards públicos de tipos de imóveis**: `types/property.ts` agora aceita `cardColor` e `coverImageUrl` vindos de `/public/property-types`; `pages/index.vue` usa a imagem de capa quando existir e cai para gradiente baseado na cor configurada pelo tenant.
 - **Custom domain resolution**: public API calls now use `resolveTenantIdentifier()` so the website works on both tenant subdomains and custom domains; backend can resolve tenants by `customDomain` when the host is not a subdomain.
 - **Tipos públicos de imóveis por tenant (#40)**: `usePublicApi` consome `/public/property-types`; home, listagem e detalhe usam labels/tipos ativos do tenant com fallback local para os códigos fixos.
 - **Vídeos públicos em imóveis (#47)**: `types/property.ts` modela `videos` no detalhe público; `pages/imoveis/[id].vue` renderiza seção "Vídeos" com iframe para `YOUTUBE` e `<video controls>` para uploads.

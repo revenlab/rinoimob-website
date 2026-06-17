@@ -9,6 +9,8 @@ export interface PublicPropertyType {
   label: string
   position: number
   active: boolean
+  cardColor: string | null
+  coverImageUrl: string | null
 }
 
 export const DEFAULT_PROPERTY_TYPE_LABELS: Record<PropertyType, string> = {
@@ -25,6 +27,8 @@ export const DEFAULT_PROPERTY_TYPES: PublicPropertyType[] = Object.entries(DEFAU
   label,
   position: (index + 1) * 10,
   active: true,
+  cardColor: null,
+  coverImageUrl: null,
 }))
 
 export function propertyTypeLabel(code: PropertyType | string, types: PublicPropertyType[] = DEFAULT_PROPERTY_TYPES): string {
