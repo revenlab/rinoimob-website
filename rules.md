@@ -109,6 +109,7 @@ await createLead(resolveSlug(), { name, email, phone, message })
 ---
 
 ## Last Changes
+- **MVP Pendência 1 / DDI revalidation (issue44)**: `PhoneInput.vue` now mirrors the app behavior for DDI state: detects the country from an existing `+DDI` model value, re-emits the phone when the selected country changes, emits an empty string when cleared, and uses an explicit outside-click listener instead of `@click.outside`.
 - **Favorites localStorage (issue39)**: Added `useLocalStorageFavorites()` composable to persist favorites across sessions using localStorage key `rinoimob_favorites`. Heart button on PropertyCard shows filled/unfilled state. Header shows badge counter with favorites count. Created `FavoritesModal.vue` to display all favorited properties with remove functionality.
 - **Favorites sync fix**: `useLocalStorageFavorites()` now keeps a shared `useState` cache so header, cards and detail pages stay in sync. `FavoritesModal.vue` loads each favorite through `usePublicApi().getProperty()` using the tenant slug instead of relying on an unsupported bulk `ids` query.
 - **Favorites heart spacing fix**: PropertyCard favorite button now uses a larger hit area (`w-11 h-11`) and a 5px icon so the filled heart is not clipped at the card corner.
