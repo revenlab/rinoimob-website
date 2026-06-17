@@ -1,4 +1,4 @@
-import type { PublicPropertySummary, PublicPropertyDetail, PageResponse, PublicLeadRequest } from '~/types/property'
+import type { PublicPropertySummary, PublicPropertyDetail, PublicPropertyType, PageResponse, PublicLeadRequest } from '~/types/property'
 import type { PublicBlogPost, PublicBlogPostSummary } from '~/types/blog'
 
 export const usePublicApi = () => {
@@ -53,6 +53,12 @@ export const usePublicApi = () => {
     })
   }
 
+  const listPropertyTypes = async (tenantSlug: string): Promise<PublicPropertyType[]> => {
+    return $fetch(`${API_BASE}/property-types`, {
+      headers: getHeaders(tenantSlug),
+    })
+  }
+
   const createLead = async (tenantSlug: string, data: PublicLeadRequest): Promise<void> => {
     return $fetch(`${API_BASE}/leads`, {
       method: 'POST',
@@ -80,5 +86,5 @@ export const usePublicApi = () => {
     })
   }
 
-  return { listProperties, getProperty, createLead, listBlogPosts, getBlogPost }
+  return { listProperties, getProperty, listPropertyTypes, createLead, listBlogPosts, getBlogPost }
 }

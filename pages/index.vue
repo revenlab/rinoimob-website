@@ -47,10 +47,7 @@
                 class="sm:w-36 px-3 py-3 text-slate-500 text-sm focus:outline-none bg-transparent border-t border-slate-100 sm:border-t-0"
               >
                 <option value="">Tipo</option>
-                <option value="HOUSE">Casa</option>
-                <option value="APARTMENT">Apartamento</option>
-                <option value="LAND">Terreno</option>
-                <option value="COMMERCIAL">Comercial</option>
+                <option v-for="type in propertyTypes" :key="type.code" :value="type.code">{{ type.label }}</option>
               </select>
               <button
                 @click="doSearch"
@@ -521,9 +518,10 @@
 </template>
 
 <script setup lang="ts">
-import type { PublicPropertySummary } from '~/types/property'
+import type { PublicPropertySummary, PublicPropertyType } from '~/types/property'
 import type { PublicLeadRequest } from '~/types/property'
 import type { PublicBlogPostSummary } from '~/types/blog'
+import { DEFAULT_PROPERTY_TYPES } from '~/types/property'
 import { DEFAULT_TENANT_CONFIG } from '~/types/tenant'
 
 definePageMeta({ layout: 'default' })
@@ -580,6 +578,7 @@ const searchQuery = ref('')
 const searchType = ref('')
 const activeFeaturedTab = ref<'SALE' | 'RENT' | 'SEASONAL'>('SALE')
 const featuredProperties = ref<PublicPropertySummary[]>([])
+const propertyTypes = ref<PublicPropertyType[]>(DEFAULT_PROPERTY_TYPES)
 const featuredPending = ref(true)
 const featuredPage = ref(0)
 const featuredItemsPerPage = 4
@@ -683,7 +682,15 @@ const doSearch = () => {
   })
 }
 
-const { listProperties, createLead, listBlogPosts } = usePublicApi()
+const { listProperties, listPropertyTypes, createLead, listBlogPosts } = usePublicApi()
+
+const loadPropertyTypes = async () => {
+  try {
+    propertyTypes.value = await listPropertyTypes(resolveSlug())
+  } catch {
+    propertyTypes.value = DEFAULT_PROPERTY_TYPES
+  }
+}
 
 const loadFeatured = async () => {
   featuredPending.value = true
@@ -736,12 +743,13 @@ const submitLead = async () => {
 }
 
 onMounted(() => {
+  loadPropertyTypes()
   loadFeatured()
   loadLaunches()
   loadBlogPosts()
 })
 
-const categories = [
+const categoryFallbacks = [
   {
     type: 'HOUSE',
     label: 'Casas',
@@ -771,6 +779,15 @@ const categories = [
     iconPath: 'M9 6.75V15m6-6v8.25m.503 3.498l4.875-2.437c.381-.19.622-.58.622-1.006V4.82c0-.836-.88-1.38-1.628-1.006l-3.869 1.934c-.317.159-.69.159-1.006 0L9.503 3.252a1.125 1.125 0 00-1.006 0L3.622 5.689C3.24 5.88 3 6.27 3 6.695V19.18c0 .836.88 1.38 1.628 1.006l3.869-1.934c.317-.159.69-.159 1.006 0l4.994 2.497c.317.158.69.158 1.006 0z',
   },
 ]
+
+const categories = computed(() => propertyTypes.value.map((type) => {
+  const fallback = categoryFallbacks.find((item) => item.type === type.code) ?? categoryFallbacks[0]
+  return {
+    ...fallback,
+    type: type.code,
+    label: type.label,
+  }
+}))
 
 const services = [
   {

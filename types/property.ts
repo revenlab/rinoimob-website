@@ -3,6 +3,34 @@ export type PropertyType = 'HOUSE' | 'APARTMENT' | 'LAND' | 'COMMERCIAL' | 'RURA
 export type PropertyStatus = 'DRAFT' | 'ACTIVE' | 'RESERVED' | 'SOLD' | 'ARCHIVED'
 export type PropertyVideoSource = 'UPLOAD' | 'YOUTUBE'
 
+export interface PublicPropertyType {
+  id: string
+  code: PropertyType
+  label: string
+  position: number
+  active: boolean
+}
+
+export const DEFAULT_PROPERTY_TYPE_LABELS: Record<PropertyType, string> = {
+  HOUSE: 'Casa',
+  APARTMENT: 'Apartamento',
+  LAND: 'Terreno',
+  COMMERCIAL: 'Comercial',
+  RURAL: 'Rural',
+}
+
+export const DEFAULT_PROPERTY_TYPES: PublicPropertyType[] = Object.entries(DEFAULT_PROPERTY_TYPE_LABELS).map(([code, label], index) => ({
+  id: code,
+  code: code as PropertyType,
+  label,
+  position: (index + 1) * 10,
+  active: true,
+}))
+
+export function propertyTypeLabel(code: PropertyType | string, types: PublicPropertyType[] = DEFAULT_PROPERTY_TYPES): string {
+  return types.find(type => type.code === code)?.label ?? DEFAULT_PROPERTY_TYPE_LABELS[code as PropertyType] ?? code
+}
+
 export interface PublicPropertySummary {
   id: string
   title: string

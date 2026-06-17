@@ -391,7 +391,8 @@
 </template>
 
 <script setup lang="ts">
-import type { PublicFloorPlanPhoto, PublicPropertyDetail, PublicPhoto } from '~/types/property'
+import type { PublicFloorPlanPhoto, PublicPropertyDetail, PublicPhoto, PublicPropertyType } from '~/types/property'
+import { DEFAULT_PROPERTY_TYPES, propertyTypeLabel } from '~/types/property'
 import { DEFAULT_TENANT_CONFIG } from '~/types/tenant'
 import { HeartIcon as HeartOutlineIcon } from '@heroicons/vue/24/outline'
 import { HeartIcon as HeartSolidIcon } from '@heroicons/vue/24/solid'
@@ -407,7 +408,7 @@ type FloorPlanDisplay = {
 definePageMeta({ layout: 'default' })
 
 const route = useRoute()
-const { getProperty, createLead } = usePublicApi()
+const { getProperty, listPropertyTypes, createLead } = usePublicApi()
 const { resolveSlug, useTenantConfigData } = useTenantConfig()
 const { data: tenantConfig } = await useTenantConfigData()
 const cfg = computed(() => ({ ...DEFAULT_TENANT_CONFIG, ...(tenantConfig.value ?? {}) }))
@@ -415,6 +416,7 @@ const brandPrimaryColor = computed(() => cfg.value.primaryColor ?? '#1e2d4d')
 const requestUrl = useRequestURL()
 
 const property = ref<PublicPropertyDetail | null>(null)
+const propertyTypes = ref<PublicPropertyType[]>(DEFAULT_PROPERTY_TYPES)
 const activePhoto = ref<PublicPhoto | null>(null)
 const pending = ref(true)
 
@@ -427,9 +429,7 @@ const operationBg = (op: string) => ({
   RENT: 'bg-emerald-600',
   SEASONAL: 'bg-amber-500',
 }[op] ?? 'bg-slate-600')
-const typeLabel = (t: string) => ({
-  HOUSE: 'Casa', APARTMENT: 'Apartamento', LAND: 'Terreno', COMMERCIAL: 'Comercial', RURAL: 'Rural'
-}[t] ?? t)
+const typeLabel = (t: string) => propertyTypeLabel(t, propertyTypes.value)
 
 const formatPrice = (price: number, currency: string) =>
   new Intl.NumberFormat('pt-BR', { style: 'currency', currency: currency || 'BRL', maximumFractionDigits: 0 }).format(price)
@@ -581,7 +581,11 @@ const submitLead = async () => {
 const loadProperty = async () => {
   try {
     const id = route.params.id as string
-    const data = await getProperty(resolveSlug(), id)
+    const [data, types] = await Promise.all([
+      getProperty(resolveSlug(), id),
+      listPropertyTypes(resolveSlug()).catch(() => DEFAULT_PROPERTY_TYPES),
+    ])
+    propertyTypes.value = types
     property.value = data
     if (data.photos && data.photos.length > 0) {
       const coverPhoto = data.photos.find((p) => p.isCover) ?? data.photos[0]

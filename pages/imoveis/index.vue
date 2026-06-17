@@ -40,11 +40,7 @@
           <select v-model="filters.propertyType" @change="applyFilters"
             class="px-3 py-2.5 text-sm border border-slate-200 rounded-xl bg-white text-slate-700 focus:outline-none focus:ring-2 focus:ring-blue-500/30">
             <option value="">Todos os tipos</option>
-            <option value="HOUSE">Casa</option>
-            <option value="APARTMENT">Apartamento</option>
-            <option value="LAND">Terreno</option>
-            <option value="COMMERCIAL">Comercial</option>
-            <option value="RURAL">Rural</option>
+            <option v-for="type in propertyTypes" :key="type.code" :value="type.code">{{ type.label }}</option>
           </select>
           <select v-model="filters.minPrice" @change="applyFilters"
             class="px-3 py-2.5 text-sm border border-slate-200 rounded-xl bg-white text-slate-700 focus:outline-none focus:ring-2 focus:ring-blue-500/30">
@@ -141,12 +137,13 @@
 </template>
 
 <script setup lang="ts">
-import type { PublicPropertySummary } from '~/types/property'
+import type { PublicPropertySummary, PublicPropertyType } from '~/types/property'
+import { DEFAULT_PROPERTY_TYPES, propertyTypeLabel } from '~/types/property'
 import { DEFAULT_TENANT_CONFIG } from '~/types/tenant'
 
 definePageMeta({ layout: 'default' })
 
-const { listProperties } = usePublicApi()
+const { listProperties, listPropertyTypes } = usePublicApi()
 const { resolveSlug, useTenantConfigData } = useTenantConfig()
 const { data: tenantConfig } = await useTenantConfigData()
 const cfg = computed(() => ({ ...DEFAULT_TENANT_CONFIG, ...(tenantConfig.value ?? {}) }))
@@ -160,7 +157,7 @@ const listDescription = computed(() => {
     const parts = [
       filters.value.operation ? `operação ${filters.value.operation.toLowerCase()}` : '',
       filters.value.q ? `busca "${filters.value.q}"` : '',
-      filters.value.propertyType ? `tipo ${filters.value.propertyType.toLowerCase()}` : '',
+      filters.value.propertyType ? `tipo ${propertyTypeLabel(filters.value.propertyType, propertyTypes.value).toLowerCase()}` : '',
       filters.value.city ? `em ${filters.value.city}` : '',
     ].filter(Boolean).join(' ')
     return parts
@@ -195,6 +192,7 @@ const currentPage = ref(Number(route.query.page) > 1 ? Number(route.query.page) 
 const totalPages = ref(1)
 const totalElements = ref(0)
 const properties = ref<PublicPropertySummary[]>([])
+const propertyTypes = ref<PublicPropertyType[]>(DEFAULT_PROPERTY_TYPES)
 const pending = ref(true)
 
 const hasActiveFilters = computed(() =>
@@ -332,6 +330,12 @@ const clearFilters = () => {
     radiusKm: '',
   }
   applyFilters()
+}
+
+try {
+  propertyTypes.value = await listPropertyTypes(resolveSlug())
+} catch {
+  propertyTypes.value = DEFAULT_PROPERTY_TYPES
 }
 
 await loadProperties()
