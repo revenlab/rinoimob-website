@@ -540,7 +540,7 @@ const onHeroMouseMove = (e: MouseEvent) => {
 
 const loadBlogPosts = async () => {
   try {
-    const data = await listBlogPosts(resolveSlug(), { page: 0, size: 3 })
+    const data = await listBlogPosts(resolveTenantIdentifier(), { page: 0, size: 3 })
     blogPosts.value = data.content
   } catch {
     blogPosts.value = []
@@ -613,7 +613,7 @@ const leadSubmitting = ref(false)
 const leadSent = ref(false)
 const blogPosts = ref<PublicBlogPostSummary[]>([])
 
-const { useTenantConfigData, resolveSlug } = useTenantConfig()
+const { useTenantConfigData, resolveTenantIdentifier } = useTenantConfig()
 const { data: tenantConfig } = await useTenantConfigData()
 const cfg = computed(() => ({ ...DEFAULT_TENANT_CONFIG, ...(tenantConfig.value ?? {}) }))
 const requestUrl = useRequestURL()
@@ -686,7 +686,7 @@ const { listProperties, listPropertyTypes, createLead, listBlogPosts } = usePubl
 
 const loadPropertyTypes = async () => {
   try {
-    propertyTypes.value = await listPropertyTypes(resolveSlug())
+    propertyTypes.value = await listPropertyTypes(resolveTenantIdentifier())
   } catch {
     propertyTypes.value = DEFAULT_PROPERTY_TYPES
   }
@@ -696,7 +696,7 @@ const loadFeatured = async () => {
   featuredPending.value = true
   featuredPage.value = 0
   try {
-    const data = await listProperties(resolveSlug(), {
+    const data = await listProperties(resolveTenantIdentifier(), {
       page: 0,
       size: 8,
       operation: activeFeaturedTab.value,
@@ -712,7 +712,7 @@ const loadFeatured = async () => {
 const loadLaunches = async () => {
   launchesPending.value = true
   try {
-    const data = await listProperties(resolveSlug(), { page: 0, size: 4, categorySlug: 'lancamentos' })
+    const data = await listProperties(resolveTenantIdentifier(), { page: 0, size: 4, categorySlug: 'lancamentos' })
     launches.value = data.content
   } catch {
     launches.value = []
@@ -732,7 +732,7 @@ const submitLead = async () => {
       message: 'Interesse em serviços exclusivos para proprietários',
       source: 'PORTAL_HOME_FORM',
     }
-    await createLead(resolveSlug(), payload)
+    await createLead(resolveTenantIdentifier(), payload)
     leadSent.value = true
     leadForm.value = { name: '', email: '', phone: '' }
   } catch {

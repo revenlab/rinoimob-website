@@ -67,7 +67,7 @@ const props = defineProps<{
   propertyId: string
 }>()
 
-const { useTenantConfigData, resolveSlug } = useTenantConfig()
+const { useTenantConfigData, resolveTenantIdentifier } = useTenantConfig()
 const { data: tenantConfig } = await useTenantConfigData()
 const cfg = computed(() => ({ ...DEFAULT_TENANT_CONFIG, ...(tenantConfig.value ?? {}) }))
 const { getProperty, createLead } = usePublicApi()
@@ -94,7 +94,7 @@ const submitForm = async () => {
   successMessage.value = ''
 
   try {
-    await createLead(resolveSlug(),{
+    await createLead(resolveTenantIdentifier(),{
       name: form.value.name,
       email: form.value.email,
       phone: form.value.phone,

@@ -108,7 +108,7 @@ const emit = defineEmits<{
 }>()
 
 const { useTenantConfigData } = useTenantConfig()
-const { resolveSlug } = useTenantConfig()
+const { resolveTenantIdentifier } = useTenantConfig()
 const { data: tenantConfig } = await useTenantConfigData()
 const cfg = computed(() => ({ ...DEFAULT_TENANT_CONFIG, ...(tenantConfig.value ?? {}) }))
 const { getProperty } = usePublicApi()
@@ -125,7 +125,7 @@ const fetchProperties = async () => {
 
   loading.value = true
   try {
-    const tenantSlug = resolveSlug()
+    const tenantSlug = resolveTenantIdentifier()
     const results = await Promise.all(
       favorites.value.map(async (propertyId) => {
         try {

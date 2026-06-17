@@ -48,12 +48,12 @@ import { DEFAULT_TENANT_CONFIG } from '~/types/tenant'
 
 definePageMeta({ layout: 'default' })
 
-const { useTenantConfigData, resolveSlug } = useTenantConfig()
+const { useTenantConfigData, resolveTenantIdentifier } = useTenantConfig()
 const { data: tenantConfig } = await useTenantConfigData()
 const cfg = computed(() => ({ ...DEFAULT_TENANT_CONFIG, ...(tenantConfig.value ?? {}) }))
 
 const { listBlogPosts } = usePublicApi()
-const slug = resolveSlug()
+const slug = resolveTenantIdentifier()
 const postsResponse = await listBlogPosts(slug, { page: 0, size: 24 }).catch(() => ({ content: [] }))
 const posts = computed(() => postsResponse.content)
 

@@ -4,12 +4,17 @@ const getTenantSlug = (event: H3Event): string => {
   const host = getRequestHeader(event, 'host') ?? ''
   if (!host) return 'demo'
 
-  const firstLabel = host.split('.')[0]
-  if (!host.includes('.') || firstLabel === 'localhost') {
+  const hostname = host.split(':')[0]
+  const firstLabel = hostname.split('.')[0]
+  if (hostname === 'localhost' || !hostname.includes('.')) {
     return getRequestHeader(event, 'x-tenant-slug') || 'demo'
   }
 
-  return firstLabel
+  if (hostname.endsWith('.localhost')) {
+    return firstLabel
+  }
+
+  return hostname
 }
 
 export default defineEventHandler(async (event) => {

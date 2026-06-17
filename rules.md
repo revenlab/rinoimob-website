@@ -110,6 +110,7 @@ await createLead(resolveSlug(), { name, email, phone, message })
 ---
 
 ## Last Changes
+- **Custom domain resolution**: public API calls now use `resolveTenantIdentifier()` so the website works on both tenant subdomains and custom domains; backend can resolve tenants by `customDomain` when the host is not a subdomain.
 - **Tipos públicos de imóveis por tenant (#40)**: `usePublicApi` consome `/public/property-types`; home, listagem e detalhe usam labels/tipos ativos do tenant com fallback local para os códigos fixos.
 - **Vídeos públicos em imóveis (#47)**: `types/property.ts` modela `videos` no detalhe público; `pages/imoveis/[id].vue` renderiza seção "Vídeos" com iframe para `YOUTUBE` e `<video controls>` para uploads.
 - Detalhe público do imóvel: seção "Localização" usa Google Maps por iframe sem API key, priorizando `lat`/`lng` quando cadastrados e caindo para endereço formatado quando não houver coordenadas.

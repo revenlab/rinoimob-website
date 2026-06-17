@@ -144,7 +144,7 @@ import { DEFAULT_TENANT_CONFIG } from '~/types/tenant'
 definePageMeta({ layout: 'default' })
 
 const { listProperties, listPropertyTypes } = usePublicApi()
-const { resolveSlug, useTenantConfigData } = useTenantConfig()
+const { resolveTenantIdentifier, useTenantConfigData } = useTenantConfig()
 const { data: tenantConfig } = await useTenantConfigData()
 const cfg = computed(() => ({ ...DEFAULT_TENANT_CONFIG, ...(tenantConfig.value ?? {}) }))
 const route = useRoute()
@@ -273,7 +273,7 @@ const syncUrl = () => {
 const loadProperties = async () => {
   pending.value = true
   try {
-    const data = await listProperties(resolveSlug(), {
+    const data = await listProperties(resolveTenantIdentifier(), {
       page: currentPage.value,
       size: 12,
       operation: filters.value.operation || undefined,
@@ -333,7 +333,7 @@ const clearFilters = () => {
 }
 
 try {
-  propertyTypes.value = await listPropertyTypes(resolveSlug())
+  propertyTypes.value = await listPropertyTypes(resolveTenantIdentifier())
 } catch {
   propertyTypes.value = DEFAULT_PROPERTY_TYPES
 }

@@ -409,7 +409,7 @@ definePageMeta({ layout: 'default' })
 
 const route = useRoute()
 const { getProperty, listPropertyTypes, createLead } = usePublicApi()
-const { resolveSlug, useTenantConfigData } = useTenantConfig()
+const { resolveTenantIdentifier, useTenantConfigData } = useTenantConfig()
 const { data: tenantConfig } = await useTenantConfigData()
 const cfg = computed(() => ({ ...DEFAULT_TENANT_CONFIG, ...(tenantConfig.value ?? {}) }))
 const brandPrimaryColor = computed(() => cfg.value.primaryColor ?? '#1e2d4d')
@@ -561,7 +561,7 @@ const submitLead = async () => {
   leadSuccess.value = false
   leadError.value = false
   try {
-    await createLead(resolveSlug(), {
+    await createLead(resolveTenantIdentifier(), {
       name: leadForm.value.name,
       email: leadForm.value.email || undefined,
       phone: leadForm.value.phone || undefined,
@@ -582,8 +582,8 @@ const loadProperty = async () => {
   try {
     const id = route.params.id as string
     const [data, types] = await Promise.all([
-      getProperty(resolveSlug(), id),
-      listPropertyTypes(resolveSlug()).catch(() => DEFAULT_PROPERTY_TYPES),
+      getProperty(resolveTenantIdentifier(), id),
+      listPropertyTypes(resolveTenantIdentifier()).catch(() => DEFAULT_PROPERTY_TYPES),
     ])
     propertyTypes.value = types
     property.value = data

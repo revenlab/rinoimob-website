@@ -40,12 +40,12 @@ definePageMeta({ layout: 'default' })
 const route = useRoute()
 const slug = String(route.params.slug || '')
 
-const { useTenantConfigData, resolveSlug } = useTenantConfig()
+const { useTenantConfigData, resolveTenantIdentifier } = useTenantConfig()
 const { data: tenantConfig } = await useTenantConfigData()
 const cfg = computed(() => ({ ...DEFAULT_TENANT_CONFIG, ...(tenantConfig.value ?? {}) }))
 
 const { getBlogPost } = usePublicApi()
-const post = await getBlogPost(resolveSlug(), slug).catch(() => null)
+const post = await getBlogPost(resolveTenantIdentifier(), slug).catch(() => null)
 
 if (!post) {
   throw createError({ statusCode: 404, statusMessage: 'Artigo não encontrado' })

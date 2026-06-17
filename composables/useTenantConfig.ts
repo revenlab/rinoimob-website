@@ -49,33 +49,41 @@ export const useTenantConfig = () => {
   const config = useRuntimeConfig()
   const API_BASE = `${config.public.apiUrl.replace(/\/$/, '')}/api/v1/public`
 
-  const resolveSlug = (): string => {
+  const resolveTenantIdentifier = (): string => {
     if (process.server) {
       const host = useRequestHeaders()['host'] || ''
-      const subdomain = host.split('.')[0]
+      const hostname = host.split(':')[0]
 
-      if (!host.includes('.') || subdomain === 'localhost') {
+      if (hostname === 'localhost' || !hostname.includes('.')) {
         return (useRoute().query.tenant as string) || 'demo'
       }
 
-      return subdomain
+      if (hostname.endsWith('.localhost')) {
+        return hostname.split('.')[0]
+      }
+
+      return hostname
     }
 
     const host = window.location.hostname
 
-    if (!host.includes('.') || host === 'localhost') {
+    if (host === 'localhost' || !host.includes('.')) {
       return (useRoute().query.tenant as string) || 'demo'
     }
 
-    return host.split('.')[0]
+    if (host.endsWith('.localhost')) {
+      return host.split('.')[0]
+    }
+
+    return host
   }
 
   const fetchConfig = async (): Promise<TenantWebsiteConfig> => {
-    const slug = resolveSlug()
+    const tenantIdentifier = resolveTenantIdentifier()
 
     try {
       const response = await $fetch<TenantWebsiteConfig>(`${API_BASE}/config`, {
-        headers: { 'X-Tenant-Slug': slug },
+        headers: { 'X-Tenant-Slug': tenantIdentifier },
       })
 
       return mergeTenantConfig(response)
@@ -85,7 +93,7 @@ export const useTenantConfig = () => {
   }
 
   const useTenantConfigData = () => {
-    const slug = resolveSlug()
+    const slug = resolveTenantIdentifier()
 
     return useAsyncData<TenantWebsiteConfig>(
       `tenant-config-${slug}`,
@@ -94,5 +102,5 @@ export const useTenantConfig = () => {
     )
   }
 
-  return { fetchConfig, useTenantConfigData, resolveSlug }
+  return { fetchConfig, useTenantConfigData, resolveTenantIdentifier, resolveSlug: resolveTenantIdentifier }
 }
