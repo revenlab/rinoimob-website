@@ -150,3 +150,4 @@ await createLead(resolveSlug(), { name, email, phone, message })
   - `usePublicApi.listProperties()` agora também serializa `latitude`, `longitude` e `radiusKm` quando presentes.
   - `pages/imoveis/index.vue` preserva esses parâmetros no estado e na URL para permitir links de busca por localização.
 - **Plantas públicas no detalhe (#41)**: `types/property.ts` agora modela `floorPlans` no contrato público; `pages/imoveis/[id].vue` renderiza a seção "Plantas" entre descrição e comodidades, com imagem destacada (`isCover`/`position === 0`) e grade responsiva para fotos adicionais.
+- **Gate de WhatsApp com lead (#45)**: CTAs públicos que antes abriam `wa.me` diretamente agora passam por `WhatsappLeadGateModal.vue`, que captura `name` + `phone` (e `email` opcional), cria lead via `/api/v1/public/leads` com origem `PORTAL_WHATSAPP_*` e só então redireciona; o estado global fica em `composables/useWhatsappLeadGate.ts`.

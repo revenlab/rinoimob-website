@@ -497,13 +497,15 @@
           {{ cfg.ctaSectionSubtitle || 'Nossos corretores estão prontos para te guiar em cada passo dessa jornada.' }}
         </p>
         <div class="flex flex-col sm:flex-row items-center justify-center gap-4">
-          <a
-            :href="cfg.whatsappNumber ? `https://wa.me/${cfg.whatsappNumber?.replace(/\\D/g, '')}` : '#'"
+          <button
+            type="button"
             class="px-8 py-3.5 rounded-full text-sm font-bold bg-white transition-all hover:shadow-lg inline-block"
             :style="{ color: cfg.primaryColor }"
+            :disabled="!cfg.whatsappNumber"
+            @click="openHomepageWhatsappGate"
           >
             Falar com Especialista
-          </a>
+          </button>
           <NuxtLink
             to="/imoveis"
             class="px-8 py-3.5 rounded-full text-sm font-bold border-2 border-white/50 text-white transition-colors hover:bg-white/10 inline-block"
@@ -616,6 +618,7 @@ const blogPosts = ref<PublicBlogPostSummary[]>([])
 const { useTenantConfigData, resolveTenantIdentifier } = useTenantConfig()
 const { data: tenantConfig } = await useTenantConfigData()
 const cfg = computed(() => ({ ...DEFAULT_TENANT_CONFIG, ...(tenantConfig.value ?? {}) }))
+const { openLeadGate } = useWhatsappLeadGate()
 const requestUrl = useRequestURL()
 const homepageCanonical = computed(() => new URL('/', requestUrl.origin).toString())
 
@@ -683,6 +686,19 @@ const doSearch = () => {
 }
 
 const { listProperties, listPropertyTypes, createLead, listBlogPosts } = usePublicApi()
+
+const normalizeWhatsappNumber = (value?: string | null) => value?.replace(/\D/g, '') ?? ''
+
+const openHomepageWhatsappGate = () => {
+  const phone = normalizeWhatsappNumber(cfg.value.whatsappNumber)
+  if (!phone) return
+
+  openLeadGate({
+    targetUrl: `https://wa.me/${phone}`,
+    source: 'PORTAL_WHATSAPP_HOME',
+    title: 'Falar com Especialista',
+  })
+}
 
 const loadPropertyTypes = async () => {
   try {

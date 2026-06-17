@@ -38,6 +38,7 @@
     </main>
 
     <FavoritesModal :isOpen="showFavoritesModal" @close="showFavoritesModal = false" />
+    <WhatsappLeadGateModal />
 
     <footer class="text-white" :style="{ backgroundColor: cfg.primaryColor }">
       <div class="max-w-7xl mx-auto px-4 sm:px-6 pt-14 pb-8">
@@ -73,19 +74,18 @@
                   <path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z" />
                 </svg>
               </a>
-              <a
+              <button
                 v-if="cfg.whatsappNumber"
-                :href="`https://wa.me/${cfg.whatsappNumber}`"
-                target="_blank"
-                rel="noopener"
+                type="button"
                 class="w-9 h-9 rounded-full bg-white/10 flex items-center justify-center hover:bg-white/20 transition-colors"
                 aria-label="WhatsApp"
+                @click="openGenericWhatsappGate"
               >
                 <svg class="w-4 h-4 text-white" fill="currentColor" viewBox="0 0 24 24">
                   <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51a12.8 12.8 0 00-.57-.01c-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347z" />
                   <path d="M12 0C5.373 0 0 5.373 0 12c0 2.123.554 4.116 1.528 5.845L.057 23.943l6.26-1.444A11.945 11.945 0 0012 24c6.627 0 12-5.373 12-12S18.627 0 12 0zm0 22c-1.89 0-3.66-.493-5.191-1.357l-.372-.221-3.863.891.945-3.762-.242-.388A9.953 9.953 0 012 12C2 6.477 6.477 2 12 2s10 4.477 10 10-4.477 10-10 10z" />
                 </svg>
-              </a>
+              </button>
             </div>
           </div>
 
@@ -153,6 +153,7 @@ import { HeartIcon as HeartSolidIcon } from '@heroicons/vue/24/solid'
 const { useTenantConfigData } = useTenantConfig()
 const { data: tenantConfig } = await useTenantConfigData()
 const cfg = computed(() => ({ ...DEFAULT_TENANT_CONFIG, ...(tenantConfig.value ?? {}) }))
+const { openLeadGate } = useWhatsappLeadGate()
 const route = useRoute()
 const requestUrl = useRequestURL()
 const { public: publicConfig } = useRuntimeConfig()
@@ -161,6 +162,19 @@ const { favorites } = useLocalStorageFavorites()
 const showFavoritesModal = ref(false)
 
 const favoritesCount = computed(() => favorites.value.length)
+
+const normalizeWhatsappNumber = (value?: string | null) => value?.replace(/\D/g, '') ?? ''
+
+const openGenericWhatsappGate = () => {
+  const phone = normalizeWhatsappNumber(cfg.value.whatsappNumber)
+  if (!phone) return
+
+  openLeadGate({
+    targetUrl: `https://wa.me/${phone}`,
+    source: 'PORTAL_WHATSAPP_GENERIC',
+    title: 'WhatsApp',
+  })
+}
 
 useHead({
   htmlAttrs: { lang: 'pt-BR' },
