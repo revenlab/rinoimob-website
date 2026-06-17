@@ -140,6 +140,35 @@
               <p class="text-slate-600 text-sm leading-relaxed whitespace-pre-line">{{ property.description }}</p>
             </div>
 
+            <!-- Location -->
+            <div v-if="hasLocation" class="bg-white rounded-2xl p-5 shadow-sm">
+              <div class="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-3 mb-4">
+                <div>
+                  <h2 class="font-semibold text-[#1e2d4d]">Localização</h2>
+                  <p v-if="fullAddress" class="text-sm text-slate-500 mt-1">{{ fullAddress }}</p>
+                </div>
+                <a
+                  :href="googleMapsUrl"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  class="inline-flex items-center justify-center px-4 py-2 text-sm font-semibold rounded-xl border transition-colors hover:bg-slate-50"
+                  :style="{ color: cfg.primaryColor, borderColor: `${cfg.primaryColor}33` }"
+                >
+                  Abrir no Google Maps
+                </a>
+              </div>
+              <div class="aspect-[16/10] sm:aspect-[16/9] overflow-hidden rounded-2xl bg-slate-100 border border-slate-100">
+                <iframe
+                  :src="googleMapsEmbedUrl"
+                  title="Mapa de localização do imóvel"
+                  class="w-full h-full border-0"
+                  loading="lazy"
+                  allowfullscreen
+                  referrerpolicy="no-referrer-when-downgrade"
+                ></iframe>
+              </div>
+            </div>
+
             <!-- Floor Plans -->
             <div v-if="floorPlansToDisplay.length" class="bg-white rounded-2xl p-5 shadow-sm">
               <div class="flex items-center justify-between gap-3 mb-5">
@@ -421,12 +450,35 @@ const fullAddress = computed(() => {
   if (!property.value) return ''
   const parts = [
     property.value.addressStreet,
+    property.value.addressNumber,
     property.value.addressNeighborhood,
     property.value.addressCity,
     property.value.addressState,
   ].filter(Boolean)
   return parts.join(', ')
 })
+
+const hasCoordinates = computed(() =>
+  Number.isFinite(property.value?.lat) && Number.isFinite(property.value?.lng)
+)
+
+const mapQuery = computed(() => {
+  if (!property.value) return ''
+  if (hasCoordinates.value) {
+    return `${property.value.lat},${property.value.lng}`
+  }
+  return fullAddress.value
+})
+
+const hasLocation = computed(() => mapQuery.value.length > 0)
+
+const googleMapsEmbedUrl = computed(() =>
+  `https://www.google.com/maps?q=${encodeURIComponent(mapQuery.value)}&output=embed`
+)
+
+const googleMapsUrl = computed(() =>
+  `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(mapQuery.value)}`
+)
 
 const sortFloorPlanPhotos = (photos: PublicFloorPlanPhoto[]) =>
   [...photos].sort((a, b) => (a.position ?? Number.MAX_SAFE_INTEGER) - (b.position ?? Number.MAX_SAFE_INTEGER))
