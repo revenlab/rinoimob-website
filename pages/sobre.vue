@@ -95,10 +95,14 @@
         <h2 class="text-3xl font-bold mb-3">Fale com nossa equipe</h2>
         <p class="text-white/80 mb-8 max-w-xl mx-auto">Estamos prontos para te ajudar a encontrar o imóvel ideal ou negociar o seu.</p>
         <div class="flex flex-wrap justify-center gap-3">
-          <a v-if="cfg.whatsappNumber" :href="`https://wa.me/${cfg.whatsappNumber?.replace(/\D/g, '')}`" target="_blank"
-            class="px-6 py-3 bg-white text-slate-900 font-semibold rounded-xl hover:bg-white/90 transition-colors">
+          <button
+            v-if="cfg.whatsappNumber"
+            type="button"
+            class="px-6 py-3 bg-white text-slate-900 font-semibold rounded-xl hover:bg-white/90 transition-colors"
+            @click="openAboutWhatsappGate"
+          >
             Falar no WhatsApp
-          </a>
+          </button>
           <NuxtLink to="/imoveis"
             class="px-6 py-3 bg-white/15 border border-white/30 text-white font-semibold rounded-xl hover:bg-white/25 transition-colors">
             Ver imóveis
@@ -118,6 +122,20 @@ definePageMeta({ layout: 'default' })
 const { useTenantConfigData } = useTenantConfig()
 const { data: tenantConfig } = await useTenantConfigData()
 const cfg = computed(() => ({ ...DEFAULT_TENANT_CONFIG, ...(tenantConfig.value ?? {}) }))
+const { openLeadGate } = useWhatsappLeadGate()
+
+const normalizeWhatsappNumber = (value?: string | null) => value?.replace(/\D/g, '') ?? ''
+
+const openAboutWhatsappGate = () => {
+  const phone = normalizeWhatsappNumber(cfg.value.whatsappNumber)
+  if (!phone) return
+
+  openLeadGate({
+    targetUrl: `https://wa.me/${phone}`,
+    source: 'PORTAL_WHATSAPP_GENERIC',
+    title: 'Falar no WhatsApp',
+  })
+}
 
 useSeoMeta({
   title: () => cfg.value.aboutPageTitle || `Sobre - ${cfg.value.companyName || 'Rinoimob'}`,
