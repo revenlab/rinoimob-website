@@ -110,6 +110,7 @@ await createLead(resolveSlug(), { name, email, phone, message })
 ---
 
 ## Last Changes
+- **Docker prod**: `Dockerfile` faz build Nuxt 3 SSR e roda `.output/server/index.mjs` em Node 20 na porta interna `3000`; `nuxt.config.ts` lê `NUXT_PUBLIC_APP_URL` separadamente de `NUXT_PUBLIC_API_URL`.
 - **Cards públicos de tipos de imóveis**: `types/property.ts` agora aceita `cardColor` e `coverImageUrl` vindos de `/public/property-types`; `pages/index.vue` usa a imagem de capa quando existir e cai para gradiente baseado na cor configurada pelo tenant.
 - **Custom domain resolution**: public API calls now use `resolveTenantIdentifier()` so the website works on both tenant subdomains and custom domains; backend can resolve tenants by `customDomain` when the host is not a subdomain.
 - **Tipos públicos de imóveis por tenant (#40)**: `usePublicApi` consome `/public/property-types`; home, listagem e detalhe usam labels/tipos ativos do tenant com fallback local para os códigos fixos.
