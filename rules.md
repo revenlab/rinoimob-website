@@ -111,7 +111,7 @@ await createLead(resolveSlug(), { name, email, phone, message })
 
 ## Last Changes
 - **Docker prod**: `Dockerfile` faz build Nuxt 3 SSR e roda `.output/server/index.mjs` em Node 20 na porta interna `3000`; `nuxt.config.ts` lê `NUXT_PUBLIC_APP_URL` separadamente de `NUXT_PUBLIC_API_URL`.
-- **API pública em produção**: chamadas públicas no browser usam `/api/v1/public` relativo ao host do tenant; SSR/sitemap usam `NUXT_API_INTERNAL_URL` para falar direto com `backend:39000`, evitando bundle com API pública apontando para `app.*`.
+- **API pública em produção**: chamadas públicas no browser usam `/api/v1/public` relativo ao host do tenant; Nginx deve proxyar `/api/` direto ao backend e o fallback Nuxt `server/routes/api/[...].ts` também usa `NUXT_API_INTERNAL_URL` em runtime. SSR/sitemap usam `NUXT_API_INTERNAL_URL` direto, evitando bundle/proxy build-time apontando para `app.*` ou `localhost`.
 - **Cards públicos de tipos de imóveis**: `types/property.ts` agora aceita `cardColor` e `coverImageUrl` vindos de `/public/property-types`; `pages/index.vue` usa a imagem de capa quando existir e cai para gradiente baseado na cor configurada pelo tenant.
 - **Custom domain resolution**: public API calls now use `resolveTenantIdentifier()` so the website works on both tenant subdomains and custom domains; backend can resolve tenants by `customDomain` when the host is not a subdomain.
 - **Tipos públicos de imóveis por tenant (#40)**: `usePublicApi` consome `/public/property-types`; home, listagem e detalhe usam labels/tipos ativos do tenant com fallback local para os códigos fixos.
