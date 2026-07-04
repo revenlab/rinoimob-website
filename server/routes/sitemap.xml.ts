@@ -21,7 +21,7 @@ export default defineEventHandler(async (event) => {
   const origin = getRequestURL(event).origin
   const tenantSlug = getTenantSlug(event)
   const config = useRuntimeConfig()
-  const apiBase = `${config.public.apiUrl.replace(/\/$/, '')}/api/v1/public`
+  const apiBase = `${config.apiInternalUrl.replace(/\/$/, '')}/api/v1/public`
 
   const properties = await $fetch<{ content: Array<{ id: string }> }>(`${apiBase}/properties?page=0&size=100`, {
     headers: { 'X-Tenant-Slug': tenantSlug },

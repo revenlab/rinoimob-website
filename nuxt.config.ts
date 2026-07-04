@@ -7,6 +7,7 @@ export default defineNuxtConfig({
     configPath: 'tailwind.config.js'
   },
   runtimeConfig: {
+    apiInternalUrl: process.env.NUXT_API_INTERNAL_URL || 'http://localhost:39000',
     public: {
       apiUrl: process.env.NUXT_PUBLIC_API_URL ?? '',
       appUrl: process.env.NUXT_PUBLIC_APP_URL ?? 'http://localhost:5173'

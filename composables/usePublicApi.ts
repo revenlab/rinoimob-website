@@ -3,7 +3,9 @@ import type { PublicBlogPost, PublicBlogPostSummary } from '~/types/blog'
 
 export const usePublicApi = () => {
   const config = useRuntimeConfig()
-  const API_BASE = `${config.public.apiUrl.replace(/\/$/, '')}/api/v1/public`
+  const API_BASE = process.server
+    ? `${config.apiInternalUrl.replace(/\/$/, '')}/api/v1/public`
+    : '/api/v1/public'
 
   const getHeaders = (tenantSlug: string) => ({
     'X-Tenant-Slug': tenantSlug,

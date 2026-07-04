@@ -47,7 +47,9 @@ const mergeTenantConfig = (config?: Partial<TenantWebsiteConfig> | null): Tenant
 
 export const useTenantConfig = () => {
   const config = useRuntimeConfig()
-  const API_BASE = `${config.public.apiUrl.replace(/\/$/, '')}/api/v1/public`
+  const API_BASE = process.server
+    ? `${config.apiInternalUrl.replace(/\/$/, '')}/api/v1/public`
+    : '/api/v1/public'
 
   const resolveTenantIdentifier = (): string => {
     if (process.server) {
