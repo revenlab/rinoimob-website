@@ -110,6 +110,8 @@ await createLead(resolveSlug(), { name, email, phone, message })
 ---
 
 ## Last Changes
+- **WhatsApp dos cards públicos**: `PropertyCard` recebe o `whatsappNumber` da página que o renderiza, garantindo que home, lançamentos e listagem usem a configuração já resolvida para o tenant atual ao abrir o gate de contato.
+- **CTAs públicos de contato (#55 e #51)**: o botão de chat nos `PropertyCard` da home agora abre o gate de WhatsApp com o imóvel e a origem `PORTAL_WHATSAPP_HOME`; o CTA "Anunciar Imóvel" leva a `/anunciar-imovel`, que cria lead com `source: PORTAL_PROPERTY_ANNOUNCEMENT`.
 - **Docker prod**: `Dockerfile` faz build Nuxt 3 SSR e roda `.output/server/index.mjs` em Node 20 na porta interna `3000`; `nuxt.config.ts` lê `NUXT_PUBLIC_APP_URL` separadamente de `NUXT_PUBLIC_API_URL`.
 - **API pública em produção**: chamadas públicas no browser usam `/api/v1/public` relativo ao host do tenant; Nginx deve proxyar `/api/` direto ao backend e o fallback Nuxt `server/routes/api/[...].ts` também usa `NUXT_API_INTERNAL_URL` em runtime. SSR/sitemap usam `NUXT_API_INTERNAL_URL` direto, evitando bundle/proxy build-time apontando para `app.*` ou `localhost`.
 - **Cards públicos de tipos de imóveis**: `types/property.ts` agora aceita `cardColor` e `coverImageUrl` vindos de `/public/property-types`; `pages/index.vue` usa a imagem de capa quando existir e cai para gradiente baseado na cor configurada pelo tenant.

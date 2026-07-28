@@ -108,6 +108,7 @@
           v-for="property in properties"
           :key="property.id"
           :property="property"
+          :whatsapp-number="cfg.whatsappNumber"
         />
       </div>
 

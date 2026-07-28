@@ -64,7 +64,8 @@
         Ver Detalhes
       </span>
       <button
-        @click.prevent.stop
+        type="button"
+        @click.prevent.stop="openPropertyWhatsappGate"
         class="w-10 h-10 rounded-full bg-blue-600 flex items-center justify-center flex-shrink-0 hover:bg-blue-700 transition-colors shadow-md"
         aria-label="Entrar em contato"
       >
@@ -83,17 +84,33 @@ import { HeartIcon as HeartSolidIcon } from '@heroicons/vue/24/solid'
 
 const props = withDefaults(defineProps<{
   property: PublicPropertySummary
+  whatsappNumber?: string | null
   cardVariant?: 'default' | 'vertical'
 }>(), {
+  whatsappNumber: null,
   cardVariant: 'default',
 })
 
 const { toggleFavorite, isFavorited } = useLocalStorageFavorites()
+const { openLeadGate } = useWhatsappLeadGate()
 
 const isPropertyFavorited = computed(() => isFavorited(props.property.id))
 
 const handleFavoriteClick = () => {
   toggleFavorite(props.property.id)
+}
+
+const openPropertyWhatsappGate = () => {
+  const phone = props.whatsappNumber?.replace(/\D/g, '')
+  if (!phone) return
+
+  const message = encodeURIComponent(`Olá, tenho interesse no imóvel: ${props.property.title}`)
+  openLeadGate({
+    targetUrl: `https://wa.me/${phone}?text=${message}`,
+    source: 'PORTAL_WHATSAPP_HOME',
+    propertyId: props.property.id,
+    title: props.property.title,
+  })
 }
 
 const cardAspectRatioClass = computed(() => (

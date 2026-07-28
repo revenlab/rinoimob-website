@@ -26,7 +26,7 @@
               {{ favoritesCount }}
             </span>
           </button>
-          <NuxtLink to="/imoveis" class="text-sm font-semibold text-white px-4 py-2 rounded-full" :style="{ backgroundColor: cfg.secondaryColor }">
+          <NuxtLink to="/anunciar-imovel" class="text-sm font-semibold text-white px-4 py-2 rounded-full" :style="{ backgroundColor: cfg.secondaryColor }">
             Anunciar Imóvel
           </NuxtLink>
         </div>
@@ -107,7 +107,7 @@
               <li><NuxtLink to="/imoveis" class="hover:text-white transition-colors">Comprar imóvel</NuxtLink></li>
               <li><NuxtLink to="/imoveis?operation=RENT" class="hover:text-white transition-colors">Alugar imóvel</NuxtLink></li>
               <li><NuxtLink to="/imoveis?categorySlug=lancamentos" class="hover:text-white transition-colors">Lançamentos</NuxtLink></li>
-              <li><NuxtLink to="/imoveis" class="hover:text-white transition-colors">Anunciar imóvel</NuxtLink></li>
+              <li><NuxtLink to="/anunciar-imovel" class="hover:text-white transition-colors">Anunciar imóvel</NuxtLink></li>
             </ul>
           </div>
 

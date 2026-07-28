@@ -188,6 +188,7 @@
                 v-for="p in page"
                 :key="p.id"
                 :property="p"
+                :whatsapp-number="cfg.whatsappNumber"
               />
             </div>
           </div>
@@ -279,6 +280,7 @@
                   v-for="p in page"
                   :key="p.id"
                   :property="p"
+                  :whatsapp-number="cfg.whatsappNumber"
                   card-variant="vertical"
                 />
               </div>
