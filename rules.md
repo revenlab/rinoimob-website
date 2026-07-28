@@ -110,6 +110,7 @@ await createLead(resolveSlug(), { name, email, phone, message })
 ---
 
 ## Last Changes
+- **Destaques selecionáveis (#50)**: a home consulta o catálogo público com `featured=true`, assim apenas imóveis marcados no painel do tenant aparecem na seção de destaques.
 - **Listagem com filtros laterais (#52)**: a busca textual ficou no topo da listagem, enquanto os filtros passaram para um painel lateral responsivo. A faixa de preço combina inputs numéricos e slider de duas alças, sincronizados com `minPrice`/`maxPrice` na URL e API pública.
 - **Filtro de preço digitável (#52)**: a listagem pública substituiu as faixas fechadas por campos numéricos de preço mínimo e máximo; a URL e a API continuam usando `minPrice`/`maxPrice`, e a consulta é bloqueada localmente quando o mínimo supera o máximo.
 - **WhatsApp dos cards públicos**: `PropertyCard` recebe o `whatsappNumber` da página que o renderiza, garantindo que home, lançamentos e listagem usem a configuração já resolvida para o tenant atual ao abrir o gate de contato.

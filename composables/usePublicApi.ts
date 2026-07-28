@@ -19,6 +19,7 @@ export const usePublicApi = () => {
       operation?: string
       propertyType?: string
       categorySlug?: string
+      featured?: boolean
       q?: string
       minPrice?: string | number
       maxPrice?: string | number
@@ -35,6 +36,7 @@ export const usePublicApi = () => {
     if (params.operation) query.set('operation', params.operation)
     if (params.propertyType) query.set('propertyType', params.propertyType)
     if (params.categorySlug) query.set('categorySlug', params.categorySlug)
+    if (params.featured != null) query.set('featured', String(params.featured))
     if (params.q) query.set('q', params.q)
     if (params.minPrice != null && params.minPrice !== '') query.set('minPrice', String(params.minPrice))
     if (params.maxPrice) query.set('maxPrice', String(params.maxPrice))

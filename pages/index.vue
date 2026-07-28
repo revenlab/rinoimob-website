@@ -718,6 +718,7 @@ const loadFeatured = async () => {
       page: 0,
       size: 8,
       operation: activeFeaturedTab.value,
+      featured: true,
     })
     featuredProperties.value = data.content
   } catch {
