@@ -1,138 +1,222 @@
 <template>
   <div class="bg-[#F1F5F9] min-h-screen">
-    <!-- Filter bar -->
-    <div class="bg-white border-b border-slate-200 py-4 sticky top-0 z-10 shadow-sm">
-      <div class="max-w-7xl mx-auto px-4 sm:px-6 space-y-3">
-        <!-- Operation pills -->
-        <div class="flex flex-wrap gap-2">
-          <button
-            v-for="op in operationOptions"
-            :key="op.value"
-            @click="setOperation(op.value)"
-            class="px-4 py-1.5 rounded-full text-sm font-semibold transition-all border"
-            :style="filters.operation === op.value
-              ? { backgroundColor: cfg.primaryColor, borderColor: cfg.primaryColor, color: '#fff' }
-              : {}"
-            :class="filters.operation === op.value
-              ? ''
-              : 'bg-white text-slate-600 border-slate-200 hover:border-blue-300 hover:text-blue-600'"
-          >
-            {{ op.label }}
-          </button>
-        </div>
-
-        <!-- Secondary filters row -->
-        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-7 gap-2 items-stretch">
+    <!-- Search bar -->
+    <div class="bg-white border-b border-slate-200 py-4 shadow-sm">
+      <div class="max-w-7xl mx-auto px-4 sm:px-6">
+        <div class="flex flex-col sm:flex-row gap-2">
           <input
             v-model="filters.q"
             type="text"
             placeholder="Buscar por título, bairro ou código"
             @keyup.enter="applyFilters"
-            class="px-4 py-2.5 text-sm text-slate-700 placeholder-slate-400 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500/30 lg:col-span-2"
+            class="flex-1 px-4 py-3 text-sm text-slate-700 placeholder-slate-400 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500/30"
           />
-          <input
-            v-model="filters.city"
-            type="text"
-            placeholder="Cidade"
-            @keyup.enter="applyFilters"
-            class="px-4 py-2.5 text-sm text-slate-700 placeholder-slate-400 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500/30"
-          />
-          <select v-model="filters.propertyType" @change="applyFilters"
-            class="px-3 py-2.5 text-sm border border-slate-200 rounded-xl bg-white text-slate-700 focus:outline-none focus:ring-2 focus:ring-blue-500/30">
-            <option value="">Todos os tipos</option>
-            <option v-for="type in propertyTypes" :key="type.code" :value="type.code">{{ type.label }}</option>
-          </select>
-          <select v-model="filters.minPrice" @change="applyFilters"
-            class="px-3 py-2.5 text-sm border border-slate-200 rounded-xl bg-white text-slate-700 focus:outline-none focus:ring-2 focus:ring-blue-500/30">
-            <option value="">Preço mín.</option>
-            <option value="200000">A partir de R$200k</option>
-            <option value="500000">A partir de R$500k</option>
-            <option value="1000000">A partir de R$1M</option>
-          </select>
-          <select v-model="filters.maxPrice" @change="applyFilters"
-            class="px-3 py-2.5 text-sm border border-slate-200 rounded-xl bg-white text-slate-700 focus:outline-none focus:ring-2 focus:ring-blue-500/30">
-            <option value="">Sem limite</option>
-            <option value="500000">Até R$500k</option>
-            <option value="1000000">R$500k – 1M</option>
-            <option value="2000000">R$1M – 2M</option>
-          </select>
-          <select v-model="filters.bedrooms" @change="applyFilters"
-            class="px-3 py-2.5 text-sm border border-slate-200 rounded-xl bg-white text-slate-700 focus:outline-none focus:ring-2 focus:ring-blue-500/30">
-            <option value="">Quartos</option>
-            <option value="1">1+ quarto</option>
-            <option value="2">2+ quartos</option>
-            <option value="3">3+ quartos</option>
-            <option value="4">4+ quartos</option>
-          </select>
           <button @click="applyFilters"
-            class="px-6 py-2.5 text-sm font-semibold text-white rounded-xl transition-colors shrink-0"
+            class="px-7 py-3 text-sm font-semibold text-white rounded-xl transition-colors shrink-0"
             :style="{ backgroundColor: cfg.primaryColor }">
             Buscar
-          </button>
-          <button v-if="hasActiveFilters" @click="clearFilters"
-            class="px-3 py-2.5 text-xs font-medium text-slate-500 border border-slate-200 rounded-xl hover:bg-slate-50 transition-colors shrink-0">
-            Limpar filtros
           </button>
         </div>
       </div>
     </div>
 
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 py-8">
-      <div class="mb-6">
-        <h1 class="text-2xl font-bold" :style="{ color: cfg.primaryColor }">Imóveis disponíveis</h1>
-        <p class="text-slate-500 text-sm mt-1">
-          {{ pending ? 'Carregando...' : `${totalElements} imóvel${totalElements !== 1 ? 'is' : ''} encontrado${totalElements !== 1 ? 's' : ''}` }}
-        </p>
-      </div>
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 py-8 lg:grid lg:grid-cols-[280px_minmax(0,1fr)] lg:gap-8">
+      <aside class="mb-6 lg:mb-0">
+        <div class="bg-white border border-slate-200 rounded-2xl p-5 shadow-sm lg:sticky lg:top-6">
+          <div class="flex items-center justify-between gap-3 pb-4 border-b border-slate-100">
+            <h2 class="font-bold text-slate-800">Filtros</h2>
+            <button
+              v-if="hasActiveFilters"
+              @click="clearFilters"
+              class="text-xs font-semibold text-slate-500 hover:text-slate-800 transition-colors"
+            >
+              Limpar
+            </button>
+          </div>
 
-      <!-- Loading -->
-      <div v-if="pending" class="flex justify-center py-20">
-        <svg class="animate-spin h-8 w-8 text-[#2563EB]" fill="none" viewBox="0 0 24 24">
-          <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4" />
-          <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
-        </svg>
-      </div>
+          <div class="py-5 border-b border-slate-100">
+            <p class="text-sm font-semibold text-slate-700 mb-3">Negócio</p>
+            <div class="flex flex-wrap gap-2">
+              <button
+                v-for="op in operationOptions"
+                :key="op.value"
+                @click="setOperation(op.value)"
+                class="px-3 py-1.5 rounded-full text-xs font-semibold transition-all border"
+                :style="filters.operation === op.value
+                  ? { backgroundColor: cfg.primaryColor, borderColor: cfg.primaryColor, color: '#fff' }
+                  : {}"
+                :class="filters.operation === op.value
+                  ? ''
+                  : 'bg-white text-slate-600 border-slate-200 hover:border-blue-300 hover:text-blue-600'"
+              >
+                {{ op.label }}
+              </button>
+            </div>
+          </div>
 
-      <!-- No results -->
-      <div v-else-if="!properties.length" class="flex flex-col items-center justify-center py-20 text-slate-400">
-        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-12 h-12 mb-3 opacity-30">
-          <path stroke-linecap="round" stroke-linejoin="round" d="M2.25 12l8.954-8.955c.44-.439 1.152-.439 1.591 0L21.75 12M4.5 9.75v10.125c0 .621.504 1.125 1.125 1.125H9.75v-4.875c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125V21h4.125c.621 0 1.125-.504 1.125-1.125V9.75" />
-        </svg>
-        <p class="font-medium">Nenhum imóvel encontrado</p>
-        <button @click="clearFilters" class="mt-3 text-sm text-[#2563EB] hover:underline">Limpar filtros</button>
-      </div>
+          <div class="py-5 border-b border-slate-100 space-y-3">
+            <label class="block text-sm font-semibold text-slate-700" for="property-city">Localização</label>
+            <input
+              id="property-city"
+              v-model="filters.city"
+              type="text"
+              placeholder="Cidade"
+              @keyup.enter="applyFilters"
+              class="w-full px-3 py-2.5 text-sm text-slate-700 placeholder-slate-400 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500/30"
+            />
+          </div>
 
-      <!-- Grid -->
-      <div v-else class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-        <PropertyCard
-          v-for="property in properties"
-          :key="property.id"
-          :property="property"
-          :whatsapp-number="cfg.whatsappNumber"
-        />
-      </div>
+          <div class="py-5 border-b border-slate-100 space-y-3">
+            <label class="block text-sm font-semibold text-slate-700" for="property-type">Tipo de imóvel</label>
+            <select id="property-type" v-model="filters.propertyType" @change="applyFilters"
+              class="w-full px-3 py-2.5 text-sm border border-slate-200 rounded-xl bg-white text-slate-700 focus:outline-none focus:ring-2 focus:ring-blue-500/30">
+              <option value="">Todos os tipos</option>
+              <option v-for="type in propertyTypes" :key="type.code" :value="type.code">{{ type.label }}</option>
+            </select>
+          </div>
 
-      <!-- Pagination -->
-      <div v-if="totalPages > 1" class="flex items-center justify-center gap-2 mt-10 flex-wrap">
-        <button :disabled="currentPage === 0" @click="goToPage(currentPage)"
-          class="px-4 py-2 text-sm rounded-xl border border-slate-200 bg-white text-slate-600 disabled:opacity-40 hover:bg-slate-50 transition-colors">
-          ← Anterior
-        </button>
-        <button
-          v-for="p in visiblePages"
-          :key="p"
-          @click="goToPage(p)"
-          class="w-9 h-9 text-sm rounded-xl border transition-colors"
-          :style="p === currentPage + 1 ? { backgroundColor: cfg.primaryColor, borderColor: cfg.primaryColor, color: '#fff' } : {}"
-          :class="p === currentPage + 1 ? 'font-semibold' : 'bg-white text-slate-600 border-slate-200 hover:bg-slate-50'"
-        >
-          {{ p }}
-        </button>
-        <button :disabled="currentPage + 1 >= totalPages" @click="goToPage(currentPage + 2)"
-          class="px-4 py-2 text-sm rounded-xl border border-slate-200 bg-white text-slate-600 disabled:opacity-40 hover:bg-slate-50 transition-colors">
-          Próxima →
-        </button>
-      </div>
+          <div class="py-5 border-b border-slate-100">
+            <div class="flex items-center justify-between mb-3">
+              <p class="text-sm font-semibold text-slate-700">Faixa de preço</p>
+              <span class="text-xs text-slate-400">{{ formatPrice(priceSliderMin) }} – {{ filters.maxPrice ? formatPrice(priceSliderMax) : 'Sem limite' }}</span>
+            </div>
+            <div class="grid grid-cols-2 gap-2 mb-5">
+              <input
+                v-model="filters.minPrice"
+                type="number"
+                min="0"
+                step="0.01"
+                inputmode="decimal"
+                placeholder="Mínimo"
+                aria-label="Preço mínimo"
+                @keyup.enter="applyFilters"
+                class="min-w-0 px-3 py-2.5 text-sm border border-slate-200 rounded-xl text-slate-700 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500/30"
+              />
+              <input
+                v-model="filters.maxPrice"
+                type="number"
+                min="0"
+                step="0.01"
+                inputmode="decimal"
+                placeholder="Máximo"
+                aria-label="Preço máximo"
+                @keyup.enter="applyFilters"
+                class="min-w-0 px-3 py-2.5 text-sm border border-slate-200 rounded-xl text-slate-700 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500/30"
+              />
+            </div>
+            <div class="relative h-5">
+              <div class="absolute left-0 right-0 top-2 h-1.5 rounded-full bg-slate-200"></div>
+              <div
+                class="absolute top-2 h-1.5 rounded-full"
+                :style="{ left: `${priceSliderMinPercent}%`, right: `${100 - priceSliderMaxPercent}%`, backgroundColor: cfg.primaryColor }"
+              ></div>
+              <input
+                class="price-range price-range-min"
+                type="range"
+                min="0"
+                :max="priceSliderLimit"
+                step="10000"
+                :value="priceSliderMin"
+                aria-label="Ajustar preço mínimo"
+                @input="setPriceSliderMin"
+              />
+              <input
+                class="price-range"
+                type="range"
+                min="0"
+                :max="priceSliderLimit"
+                step="10000"
+                :value="priceSliderMax"
+                aria-label="Ajustar preço máximo"
+                @input="setPriceSliderMax"
+              />
+            </div>
+            <div class="flex justify-between mt-2 text-xs text-slate-400">
+              <span>R$ 0</span>
+              <span>{{ formatPrice(priceSliderLimit) }}</span>
+            </div>
+            <p v-if="priceRangeError" class="mt-3 text-xs text-red-600">
+              O preço mínimo não pode ser maior que o preço máximo.
+            </p>
+          </div>
+
+          <div class="py-5">
+            <label class="block text-sm font-semibold text-slate-700 mb-3" for="property-bedrooms">Quartos</label>
+            <select id="property-bedrooms" v-model="filters.bedrooms" @change="applyFilters"
+              class="w-full px-3 py-2.5 text-sm border border-slate-200 rounded-xl bg-white text-slate-700 focus:outline-none focus:ring-2 focus:ring-blue-500/30">
+              <option value="">Qualquer quantidade</option>
+              <option value="1">1+ quarto</option>
+              <option value="2">2+ quartos</option>
+              <option value="3">3+ quartos</option>
+              <option value="4">4+ quartos</option>
+            </select>
+          </div>
+
+          <button @click="applyFilters"
+            class="w-full px-6 py-3 text-sm font-semibold text-white rounded-xl transition-colors"
+            :style="{ backgroundColor: cfg.primaryColor }">
+            Aplicar filtros
+          </button>
+        </div>
+      </aside>
+
+      <section>
+        <div class="mb-6">
+          <h1 class="text-2xl font-bold" :style="{ color: cfg.primaryColor }">Imóveis disponíveis</h1>
+          <p class="text-slate-500 text-sm mt-1">
+            {{ pending ? 'Carregando...' : `${totalElements} imóvel${totalElements !== 1 ? 'is' : ''} encontrado${totalElements !== 1 ? 's' : ''}` }}
+          </p>
+        </div>
+
+        <!-- Loading -->
+        <div v-if="pending" class="flex justify-center py-20">
+          <svg class="animate-spin h-8 w-8 text-[#2563EB]" fill="none" viewBox="0 0 24 24">
+            <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4" />
+            <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
+          </svg>
+        </div>
+
+        <!-- No results -->
+        <div v-else-if="!properties.length" class="flex flex-col items-center justify-center py-20 text-slate-400">
+          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-12 h-12 mb-3 opacity-30">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M2.25 12l8.954-8.955c.44-.439 1.152-.439 1.591 0L21.75 12M4.5 9.75v10.125c0 .621.504 1.125 1.125 1.125H9.75v-4.875c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125V21h4.125c.621 0 1.125-.504 1.125-1.125V9.75" />
+          </svg>
+          <p class="font-medium">Nenhum imóvel encontrado</p>
+          <button @click="clearFilters" class="mt-3 text-sm text-[#2563EB] hover:underline">Limpar filtros</button>
+        </div>
+
+        <!-- Grid -->
+        <div v-else class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-6">
+          <PropertyCard
+            v-for="property in properties"
+            :key="property.id"
+            :property="property"
+            :whatsapp-number="cfg.whatsappNumber"
+          />
+        </div>
+
+        <!-- Pagination -->
+        <div v-if="totalPages > 1" class="flex items-center justify-center gap-2 mt-10 flex-wrap">
+          <button :disabled="currentPage === 0" @click="goToPage(currentPage)"
+            class="px-4 py-2 text-sm rounded-xl border border-slate-200 bg-white text-slate-600 disabled:opacity-40 hover:bg-slate-50 transition-colors">
+            ← Anterior
+          </button>
+          <button
+            v-for="p in visiblePages"
+            :key="p"
+            @click="goToPage(p)"
+            class="w-9 h-9 text-sm rounded-xl border transition-colors"
+            :style="p === currentPage + 1 ? { backgroundColor: cfg.primaryColor, borderColor: cfg.primaryColor, color: '#fff' } : {}"
+            :class="p === currentPage + 1 ? 'font-semibold' : 'bg-white text-slate-600 border-slate-200 hover:bg-slate-50'"
+          >
+            {{ p }}
+          </button>
+          <button :disabled="currentPage + 1 >= totalPages" @click="goToPage(currentPage + 2)"
+            class="px-4 py-2 text-sm rounded-xl border border-slate-200 bg-white text-slate-600 disabled:opacity-40 hover:bg-slate-50 transition-colors">
+            Próxima →
+          </button>
+        </div>
+      </section>
     </div>
   </div>
 </template>
@@ -211,6 +295,60 @@ const hasActiveFilters = computed(() =>
     filters.value.radiusKm
   )
 )
+
+const priceRangeError = computed(() => {
+  const minPrice = Number(filters.value.minPrice)
+  const maxPrice = Number(filters.value.maxPrice)
+
+  return filters.value.minPrice !== ''
+    && filters.value.maxPrice !== ''
+    && Number.isFinite(minPrice)
+    && Number.isFinite(maxPrice)
+    && minPrice > maxPrice
+})
+
+const DEFAULT_PRICE_SLIDER_LIMIT = 5_000_000
+
+const priceSliderLimit = computed(() => {
+  const highestSelectedPrice = Math.max(
+    Number(filters.value.minPrice) || 0,
+    Number(filters.value.maxPrice) || 0,
+  )
+
+  return Math.max(
+    DEFAULT_PRICE_SLIDER_LIMIT,
+    Math.ceil(highestSelectedPrice / 500_000) * 500_000,
+  )
+})
+
+const priceSliderMin = computed(() => Number(filters.value.minPrice) || 0)
+const priceSliderMax = computed(() => Number(filters.value.maxPrice) || priceSliderLimit.value)
+const priceSliderMinPercent = computed(() => (priceSliderMin.value / priceSliderLimit.value) * 100)
+const priceSliderMaxPercent = computed(() => (priceSliderMax.value / priceSliderLimit.value) * 100)
+
+const formatPrice = (value: number) => new Intl.NumberFormat('pt-BR', {
+  style: 'currency',
+  currency: 'BRL',
+  maximumFractionDigits: 0,
+}).format(value)
+
+const setPriceSliderMin = (event: Event) => {
+  const value = Number((event.target as HTMLInputElement).value)
+  filters.value.minPrice = String(value)
+
+  if (filters.value.maxPrice && value > Number(filters.value.maxPrice)) {
+    filters.value.maxPrice = String(value)
+  }
+}
+
+const setPriceSliderMax = (event: Event) => {
+  const value = Number((event.target as HTMLInputElement).value)
+  filters.value.maxPrice = String(value)
+
+  if (value < priceSliderMin.value) {
+    filters.value.minPrice = String(value)
+  }
+}
 
 const visiblePages = computed(() => {
   const total = totalPages.value
@@ -305,6 +443,7 @@ const setOperation = (value: string) => {
 }
 
 const applyFilters = () => {
+  if (priceRangeError.value) return
   currentPage.value = 0
   syncUrl()
   loadProperties()
@@ -341,3 +480,49 @@ try {
 
 await loadProperties()
 </script>
+
+<style scoped>
+.price-range {
+  appearance: none;
+  -webkit-appearance: none;
+  background: transparent;
+  cursor: pointer;
+  height: 1.5rem;
+  left: 0;
+  pointer-events: none;
+  position: absolute;
+  top: 0;
+  width: 100%;
+}
+
+.price-range::-webkit-slider-thumb {
+  appearance: none;
+  -webkit-appearance: none;
+  background: #ffffff;
+  border: 3px solid v-bind('cfg.primaryColor');
+  border-radius: 9999px;
+  box-shadow: 0 1px 3px rgb(15 23 42 / 0.2);
+  height: 1rem;
+  pointer-events: auto;
+  width: 1rem;
+}
+
+.price-range::-moz-range-thumb {
+  background: #ffffff;
+  border: 3px solid v-bind('cfg.primaryColor');
+  border-radius: 9999px;
+  box-shadow: 0 1px 3px rgb(15 23 42 / 0.2);
+  height: 0.7rem;
+  pointer-events: auto;
+  width: 0.7rem;
+}
+
+.price-range::-webkit-slider-runnable-track,
+.price-range::-moz-range-track {
+  background: transparent;
+}
+
+.price-range-min {
+  z-index: 2;
+}
+</style>
