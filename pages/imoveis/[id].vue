@@ -78,8 +78,8 @@
 
             <!-- Price -->
             <div class="bg-white rounded-2xl p-5 shadow-sm">
-              <p v-if="property.price" class="text-3xl font-bold" :style="{ color: cfg.primaryColor }">
-                {{ formatPrice(property.price, property.currency) }}
+              <p v-if="displayPrice" class="text-3xl font-bold" :style="{ color: cfg.primaryColor }">
+                {{ priceDisplayLabel }}{{ formatPrice(displayPrice, property.currency) }}
                 <span v-if="property.operation === 'RENT'" class="text-base font-normal text-slate-400">/mês</span>
               </p>
               <p v-else class="text-xl font-semibold text-slate-400">Consulte o preço</p>
@@ -233,6 +233,19 @@
                     >
                       {{ formatArea(plan.area) }}m²
                     </span>
+                    <span v-if="plan.priceFrom" class="text-xs font-semibold px-2.5 py-1 rounded-full bg-emerald-50 text-emerald-700">
+                      A partir de {{ formatPrice(plan.priceFrom, property.currency) }}
+                    </span>
+                    <span v-if="plan.priceTo" class="text-xs font-medium text-slate-500">
+                      até {{ formatPrice(plan.priceTo, property.currency) }}
+                    </span>
+                  </div>
+
+                  <div v-if="plan.bedrooms || plan.suites || plan.bathrooms || plan.parking" class="flex flex-wrap gap-x-4 gap-y-1 mb-4 text-sm text-slate-500">
+                    <span v-if="plan.bedrooms">{{ plan.bedrooms }} {{ plan.bedrooms === 1 ? 'quarto' : 'quartos' }}</span>
+                    <span v-if="plan.suites">{{ plan.suites }} {{ plan.suites === 1 ? 'suíte' : 'suítes' }}</span>
+                    <span v-if="plan.bathrooms">{{ plan.bathrooms }} {{ plan.bathrooms === 1 ? 'banheiro' : 'banheiros' }}</span>
+                    <span v-if="plan.parking">{{ plan.parking }} {{ plan.parking === 1 ? 'vaga' : 'vagas' }}</span>
                   </div>
 
                   <div v-if="plan.coverPhoto" class="space-y-3">
@@ -425,6 +438,12 @@ type FloorPlanDisplay = {
   id: string
   name: string
   area: number | null
+  priceFrom: number | null
+  priceTo: number | null
+  bedrooms: number | null
+  suites: number | null
+  bathrooms: number | null
+  parking: number | null
   coverPhoto: PublicFloorPlanPhoto | null
   additionalPhotos: PublicFloorPlanPhoto[]
 }
@@ -561,11 +580,27 @@ const floorPlansToDisplay = computed<FloorPlanDisplay[]>(() =>
         id: plan.id,
         name: plan.name,
         area: plan.area,
+        priceFrom: plan.priceFrom,
+        priceTo: plan.priceTo,
+        bedrooms: plan.bedrooms,
+        suites: plan.suites,
+        bathrooms: plan.bathrooms,
+        parking: plan.parking,
         coverPhoto,
         additionalPhotos,
       }
     }) ?? []
 )
+
+const lowestFloorPlanPrice = computed(() => {
+  const prices = (property.value?.floorPlans ?? [])
+    .map(plan => plan.priceFrom)
+    .filter((price): price is number => price != null && price > 0)
+  return prices.length ? Math.min(...prices) : null
+})
+
+const displayPrice = computed(() => lowestFloorPlanPrice.value ?? property.value?.price ?? null)
+const priceDisplayLabel = computed(() => lowestFloorPlanPrice.value != null ? 'A partir de ' : '')
 
 const videosToDisplay = computed(() =>
   [...(property.value?.videos ?? [])].sort((a, b) => (a.position ?? 0) - (b.position ?? 0))

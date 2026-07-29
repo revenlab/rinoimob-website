@@ -282,6 +282,7 @@
                   :property="p"
                   :whatsapp-number="cfg.whatsappNumber"
                   card-variant="vertical"
+                  price-prefix="A partir de"
                 />
               </div>
             </div>

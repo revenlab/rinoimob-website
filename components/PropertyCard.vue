@@ -39,6 +39,7 @@
     <!-- Info panel: shifts up slightly on hover -->
     <div class="absolute bottom-0 left-0 right-0 p-4 transition-all duration-300 group-hover:pb-14">
       <p v-if="property.price" class="text-white font-bold text-base leading-tight">
+        <span v-if="pricePrefix" class="text-xs font-medium text-slate-200">{{ pricePrefix }} </span>
         {{ formattedPrice }}
         <span v-if="property.operation === 'RENT'" class="text-xs font-normal text-slate-300">/mês</span>
       </p>
@@ -86,9 +87,11 @@ const props = withDefaults(defineProps<{
   property: PublicPropertySummary
   whatsappNumber?: string | null
   cardVariant?: 'default' | 'vertical'
+  pricePrefix?: string
 }>(), {
   whatsappNumber: null,
   cardVariant: 'default',
+  pricePrefix: '',
 })
 
 const { toggleFavorite, isFavorited } = useLocalStorageFavorites()

@@ -110,6 +110,7 @@ await createLead(resolveSlug(), { name, email, phone, message })
 ---
 
 ## Last Changes
+- **Preço inicial de lançamentos (#62)**: os cards verticais da seção de lançamentos da home recebem o prefixo “A partir de”; os demais usos de `PropertyCard` continuam exibindo apenas o preço do imóvel.
 - **Imóveis semelhantes (#60)**: detalhes públicos agora consultam até quatro imóveis ativos com a mesma operação, tipo e, quando disponível, cidade; o imóvel atual é removido antes de renderizar cards reutilizáveis. Como lançamentos usam a mesma rota, também recebem a recomendação.
 - **Destaques selecionáveis (#50)**: a home consulta o catálogo público com `featured=true`, assim apenas imóveis marcados no painel do tenant aparecem na seção de destaques.
 - **Listagem com filtros laterais (#52)**: a busca textual ficou no topo da listagem, enquanto os filtros passaram para um painel lateral responsivo. A faixa de preço combina inputs numéricos e slider de duas alças, sincronizados com `minPrice`/`maxPrice` na URL e API pública.
@@ -160,3 +161,4 @@ await createLead(resolveSlug(), { name, email, phone, message })
 - **Plantas públicas no detalhe (#41)**: `types/property.ts` agora modela `floorPlans` no contrato público; `pages/imoveis/[id].vue` renderiza a seção "Plantas" entre descrição e comodidades, com imagem destacada (`isCover`/`position === 0`) e grade responsiva para fotos adicionais.
 - **Gate de WhatsApp com lead (#45)**: CTAs públicos que antes abriam `wa.me` diretamente agora passam por `WhatsappLeadGateModal.vue`, que captura `name` + `phone` (e `email` opcional), cria lead via `/api/v1/public/leads` com origem `PORTAL_WHATSAPP_*` e só então redireciona; o estado global fica em `composables/useWhatsappLeadGate.ts`.
 - **CTA WhatsApp na página Sobre**: `pages/sobre.vue` agora usa `useWhatsappLeadGate()` no botão "Falar no WhatsApp", mantendo a captura de lead antes do redirecionamento também na rota `/sobre`.
+- **Comercialização por planta**: o detalhe do imóvel exibe valores e cômodos de cada planta e prioriza o menor preço inicial como "A partir de", mantendo o preço geral do imóvel como fallback.

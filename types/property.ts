@@ -87,6 +87,12 @@ export interface PublicFloorPlan {
   id: string
   name: string
   area: number | null
+  priceFrom: number | null
+  priceTo: number | null
+  bedrooms: number | null
+  suites: number | null
+  bathrooms: number | null
+  parking: number | null
   photos: PublicFloorPlanPhoto[]
 }
 
