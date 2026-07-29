@@ -110,6 +110,7 @@ await createLead(resolveSlug(), { name, email, phone, message })
 ---
 
 ## Last Changes
+- **Imóveis semelhantes (#60)**: detalhes públicos agora consultam até quatro imóveis ativos com a mesma operação, tipo e, quando disponível, cidade; o imóvel atual é removido antes de renderizar cards reutilizáveis. Como lançamentos usam a mesma rota, também recebem a recomendação.
 - **Destaques selecionáveis (#50)**: a home consulta o catálogo público com `featured=true`, assim apenas imóveis marcados no painel do tenant aparecem na seção de destaques.
 - **Listagem com filtros laterais (#52)**: a busca textual ficou no topo da listagem, enquanto os filtros passaram para um painel lateral responsivo. A faixa de preço combina inputs numéricos e slider de duas alças, sincronizados com `minPrice`/`maxPrice` na URL e API pública.
 - **Filtro de preço digitável (#52)**: a listagem pública substituiu as faixas fechadas por campos numéricos de preço mínimo e máximo; a URL e a API continuam usando `minPrice`/`maxPrice`, e a consulta é bloqueada localmente quando o mínimo supera o máximo.

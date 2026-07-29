@@ -379,6 +379,30 @@
             <PropertyNotFoundForm :propertyId="property.id" />
           </div>
         </div>
+
+        <section v-if="similarPending || similarProperties.length" class="mt-12">
+          <div class="flex items-end justify-between gap-4 mb-5">
+            <div>
+              <p class="text-xs font-bold tracking-[0.16em] uppercase" :style="{ color: cfg.secondaryColor }">Você também pode gostar</p>
+              <h2 class="text-2xl font-bold text-slate-900 mt-1">Imóveis semelhantes</h2>
+            </div>
+            <NuxtLink to="/imoveis" class="text-sm font-semibold hover:underline" :style="{ color: cfg.primaryColor }">
+              Ver todos
+            </NuxtLink>
+          </div>
+
+          <div v-if="similarPending" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+            <div v-for="index in 4" :key="index" class="aspect-[4/3] rounded-2xl bg-slate-200 animate-pulse"></div>
+          </div>
+          <div v-else class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+            <PropertyCard
+              v-for="similarProperty in similarProperties"
+              :key="similarProperty.id"
+              :property="similarProperty"
+              :whatsapp-number="cfg.whatsappNumber"
+            />
+          </div>
+        </section>
       </div>
     </div>
 
@@ -391,7 +415,7 @@
 </template>
 
 <script setup lang="ts">
-import type { PublicFloorPlanPhoto, PublicPropertyDetail, PublicPhoto, PublicPropertyType } from '~/types/property'
+import type { PublicFloorPlanPhoto, PublicPropertyDetail, PublicPhoto, PublicPropertySummary, PublicPropertyType } from '~/types/property'
 import { DEFAULT_PROPERTY_TYPES, propertyTypeLabel } from '~/types/property'
 import { DEFAULT_TENANT_CONFIG } from '~/types/tenant'
 import { HeartIcon as HeartOutlineIcon } from '@heroicons/vue/24/outline'
@@ -408,7 +432,7 @@ type FloorPlanDisplay = {
 definePageMeta({ layout: 'default' })
 
 const route = useRoute()
-const { getProperty, listPropertyTypes, createLead } = usePublicApi()
+const { getProperty, listProperties, listPropertyTypes, createLead } = usePublicApi()
 const { resolveTenantIdentifier, useTenantConfigData } = useTenantConfig()
 const { data: tenantConfig } = await useTenantConfigData()
 const cfg = computed(() => ({ ...DEFAULT_TENANT_CONFIG, ...(tenantConfig.value ?? {}) }))
@@ -420,6 +444,8 @@ const property = ref<PublicPropertyDetail | null>(null)
 const propertyTypes = ref<PublicPropertyType[]>(DEFAULT_PROPERTY_TYPES)
 const activePhoto = ref<PublicPhoto | null>(null)
 const pending = ref(true)
+const similarProperties = ref<PublicPropertySummary[]>([])
+const similarPending = ref(false)
 
 const { toggleFavorite, isFavorited } = useLocalStorageFavorites()
 const isPropertyFavorited = computed(() => property.value ? isFavorited(property.value.id) : false)
@@ -596,6 +622,26 @@ const submitLead = async () => {
   }
 }
 
+const loadSimilarProperties = async (currentProperty: PublicPropertyDetail) => {
+  similarPending.value = true
+  try {
+    const data = await listProperties(resolveTenantIdentifier(), {
+      page: 0,
+      size: 5,
+      operation: currentProperty.operation,
+      propertyType: currentProperty.propertyType,
+      city: currentProperty.addressCity || undefined,
+    })
+    similarProperties.value = data.content
+      .filter((candidate) => candidate.id !== currentProperty.id)
+      .slice(0, 4)
+  } catch {
+    similarProperties.value = []
+  } finally {
+    similarPending.value = false
+  }
+}
+
 const loadProperty = async () => {
   try {
     const id = route.params.id as string
@@ -605,6 +651,7 @@ const loadProperty = async () => {
     ])
     propertyTypes.value = types
     property.value = data
+    await loadSimilarProperties(data)
     if (data.photos && data.photos.length > 0) {
       const coverPhoto = data.photos.find((p) => p.isCover) ?? data.photos[0]
       activePhoto.value = coverPhoto
