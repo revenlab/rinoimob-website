@@ -113,6 +113,7 @@ await createLead(resolveSlug(), { name, email, phone, message })
 - **Categorias em carrossel (#56)**: a home mantém todos os cards em uma faixa horizontal sem quebra de linha, com arraste nativo, snap e botões laterais em telas maiores.
 - **Correção do carrossel de categorias**: em telas grandes a faixa mostra três cards por vez, preservando overflow para que os controles laterais avancem até os demais cards.
 - **Galeria do imóvel**: a foto principal do detalhe usa alturas responsivas, limitada a 440px no desktop para não dominar a página em telas largas.
+- **Fundo da galeria**: a área da foto e suas miniaturas usam o mesmo cinza claro do site, com borda escura na foto selecionada para manter o contraste.
 - **Preço inicial de lançamentos (#62)**: os cards verticais da seção de lançamentos da home recebem o prefixo “A partir de”; os demais usos de `PropertyCard` continuam exibindo apenas o preço do imóvel.
 - **Imóveis semelhantes (#60)**: detalhes públicos agora consultam até quatro imóveis ativos com a mesma operação, tipo e, quando disponível, cidade; o imóvel atual é removido antes de renderizar cards reutilizáveis. Como lançamentos usam a mesma rota, também recebem a recomendação.
 - **Destaques selecionáveis (#50)**: a home consulta o catálogo público com `featured=true`, assim apenas imóveis marcados no painel do tenant aparecem na seção de destaques.

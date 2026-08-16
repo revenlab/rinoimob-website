@@ -10,7 +10,7 @@
 
     <div v-else-if="property">
       <!-- Photo Gallery -->
-      <div class="bg-black">
+      <div class="bg-[#F1F5F9]">
         <div class="max-w-7xl mx-auto px-0 sm:px-6">
           <div class="h-[260px] sm:h-[360px] lg:h-[440px] overflow-hidden">
             <img
@@ -27,13 +27,13 @@
           </div>
 
           <!-- Thumbnails -->
-          <div v-if="property.photos && property.photos.length > 1" class="flex gap-2 overflow-x-auto py-2 px-4 sm:px-0 bg-black/80">
+          <div v-if="property.photos && property.photos.length > 1" class="flex gap-2 overflow-x-auto py-2 px-4 sm:px-0 bg-[#F1F5F9]">
             <button
               v-for="photo in property.photos"
               :key="photo.id"
               @click="activePhoto = photo"
               class="shrink-0 w-20 h-14 rounded overflow-hidden border-2 transition-all"
-              :class="activePhoto?.id === photo.id ? 'border-white' : 'border-transparent opacity-60 hover:opacity-100'"
+              :class="activePhoto?.id === photo.id ? 'border-slate-800' : 'border-transparent opacity-60 hover:opacity-100'"
             >
               <img :src="photo.url" :alt="photo.altText || ''" class="w-full h-full object-cover" />
             </button>
