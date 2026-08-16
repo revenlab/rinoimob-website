@@ -110,6 +110,7 @@ await createLead(resolveSlug(), { name, email, phone, message })
 ---
 
 ## Last Changes
+- **Categorias em carrossel (#56)**: a home mantém todos os cards em uma faixa horizontal sem quebra de linha, com arraste nativo, snap e botões laterais em telas maiores.
 - **Preço inicial de lançamentos (#62)**: os cards verticais da seção de lançamentos da home recebem o prefixo “A partir de”; os demais usos de `PropertyCard` continuam exibindo apenas o preço do imóvel.
 - **Imóveis semelhantes (#60)**: detalhes públicos agora consultam até quatro imóveis ativos com a mesma operação, tipo e, quando disponível, cidade; o imóvel atual é removido antes de renderizar cards reutilizáveis. Como lançamentos usam a mesma rota, também recebem a recomendação.
 - **Destaques selecionáveis (#50)**: a home consulta o catálogo público com `featured=true`, assim apenas imóveis marcados no painel do tenant aparecem na seção de destaques.

@@ -312,16 +312,36 @@
          CATEGORIAS
     ============================================= -->
     <section class="max-w-7xl mx-auto px-4 sm:px-6 py-16">
-      <div class="mb-8">
-        <h2 class="text-2xl font-bold text-slate-900">{{ cfg.categoriesSectionTitle || 'Categorias' }}</h2>
-        <p class="text-slate-500 text-sm mt-1">{{ cfg.categoriesSectionSubtitle || 'Explore imóveis por estilo e necessidade.' }}</p>
+      <div class="mb-8 flex items-end justify-between gap-4">
+        <div>
+          <h2 class="text-2xl font-bold text-slate-900">{{ cfg.categoriesSectionTitle || 'Categorias' }}</h2>
+          <p class="text-slate-500 text-sm mt-1">{{ cfg.categoriesSectionSubtitle || 'Explore imóveis por estilo e necessidade.' }}</p>
+        </div>
+        <div class="hidden sm:flex items-center gap-2">
+          <button
+            type="button"
+            class="w-10 h-10 rounded-full border border-slate-200 text-slate-500 hover:border-slate-300 hover:text-slate-800 transition-colors"
+            aria-label="Ver categorias anteriores"
+            @click="scrollCategories(-1)"
+          >
+            ←
+          </button>
+          <button
+            type="button"
+            class="w-10 h-10 rounded-full border border-slate-200 text-slate-500 hover:border-slate-300 hover:text-slate-800 transition-colors"
+            aria-label="Ver próximas categorias"
+            @click="scrollCategories(1)"
+          >
+            →
+          </button>
+        </div>
       </div>
-      <div class="grid grid-cols-2 lg:grid-cols-4 gap-4">
+      <div ref="categoriesCarousel" class="flex gap-4 overflow-x-auto pb-3 snap-x snap-mandatory scroll-smooth [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
         <NuxtLink
           v-for="cat in categories"
           :key="cat.type"
           :to="`/imoveis?propertyType=${cat.type}`"
-          class="group relative rounded-2xl overflow-hidden block cursor-pointer"
+          class="group relative shrink-0 w-[78vw] sm:w-[290px] lg:w-[calc((100%-3rem)/4)] rounded-2xl overflow-hidden block cursor-pointer snap-start"
           style="aspect-ratio: 4/3;"
         >
           <div
@@ -533,6 +553,7 @@ definePageMeta({ layout: 'default' })
 
 // ── Hero parallax ──────────────────────────────────────────────────────────
 const heroRef = ref<HTMLElement | null>(null)
+const categoriesCarousel = ref<HTMLElement | null>(null)
 const mouseX = ref(0) // -1 to 1
 const mouseY = ref(0) // -1 to 1
 
@@ -685,6 +706,13 @@ const doSearch = () => {
       ...(searchQuery.value ? { q: searchQuery.value } : {}),
       ...(searchType.value ? { propertyType: searchType.value } : {}),
     },
+  })
+}
+
+const scrollCategories = (direction: -1 | 1) => {
+  categoriesCarousel.value?.scrollBy({
+    left: direction * Math.max(categoriesCarousel.value.clientWidth * 0.8, 280),
+    behavior: 'smooth',
   })
 }
 
