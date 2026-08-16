@@ -341,7 +341,7 @@
           v-for="cat in categories"
           :key="cat.type"
           :to="`/imoveis?propertyType=${cat.type}`"
-          class="group relative shrink-0 w-[78vw] sm:w-[290px] lg:w-[calc((100%-3rem)/4)] rounded-2xl overflow-hidden block cursor-pointer snap-start"
+          class="group relative shrink-0 w-[78vw] sm:w-[290px] lg:w-[calc((100%-2rem)/3)] rounded-2xl overflow-hidden block cursor-pointer snap-start"
           style="aspect-ratio: 4/3;"
         >
           <div
