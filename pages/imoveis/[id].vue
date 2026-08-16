@@ -12,7 +12,7 @@
       <!-- Photo Gallery -->
       <div class="bg-black">
         <div class="max-w-7xl mx-auto px-0 sm:px-6">
-          <div class="aspect-video overflow-hidden">
+          <div class="h-[260px] sm:h-[360px] lg:h-[440px] overflow-hidden">
             <img
               v-if="activePhoto"
               :src="activePhoto.url"
