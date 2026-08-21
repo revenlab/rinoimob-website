@@ -22,6 +22,7 @@ export interface TenantWebsiteConfig {
   categoriesSectionSubtitle?: string | null
   servicesSectionTitle?: string | null
   servicesSectionSubtitle?: string | null
+  servicesItems?: string | null
   servicesFormTitle?: string | null
   servicesFormSubtitle?: string | null
   statsSectionTitle?: string | null
@@ -66,6 +67,7 @@ export const DEFAULT_TENANT_CONFIG: TenantWebsiteConfig = {
   categoriesSectionSubtitle: 'Explore o tipo de imóvel ideal para cada momento.',
   servicesSectionTitle: 'Serviços Exclusivos para Proprietários',
   servicesSectionSubtitle: 'Oferecemos suporte completo para você tomar as melhores decisões com tranquilidade.',
+  servicesItems: null,
   servicesFormTitle: 'Informações de Contato',
   servicesFormSubtitle: 'Preencha abaixo e um especialista entrará em contato.',
   statsSectionTitle: 'Nossa presença no mercado',

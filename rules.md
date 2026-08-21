@@ -110,6 +110,9 @@ await createLead(resolveSlug(), { name, email, phone, message })
 ---
 
 ## Last Changes
+
+- **Serviços configuráveis da home (#54)**: a seção de serviços lê a lista ordenada `servicesItems` do tenant e exibe imagem por URL quando houver, depois emoji, com o ícone de confirmação como fallback. Conteúdo ausente ou inválido preserva a lista padrão da home.
+
 - **Categorias em carrossel (#56)**: a home mantém todos os cards em uma faixa horizontal sem quebra de linha, com arraste nativo, snap e botões laterais em telas maiores.
 - **Correção do carrossel de categorias**: em telas grandes a faixa mostra três cards por vez, preservando overflow para que os controles laterais avancem até os demais cards.
 - **Galeria do imóvel**: a foto principal do detalhe usa alturas responsivas, limitada a 440px no desktop para não dominar a página em telas largas.
