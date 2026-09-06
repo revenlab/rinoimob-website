@@ -13,6 +13,16 @@ export interface PublicPropertyType {
   coverImageUrl: string | null
 }
 
+export interface PublicBrokerProfile {
+  slug: string
+  name: string
+  phone: string | null
+  bio: string | null
+  photoUrl: string | null
+  instagramUrl: string | null
+  creci: string | null
+}
+
 export const DEFAULT_PROPERTY_TYPE_LABELS: Record<PropertyType, string> = {
   HOUSE: 'Casa',
   APARTMENT: 'Apartamento',
@@ -130,4 +140,5 @@ export interface PublicLeadRequest {
   message?: string
   propertyId?: string
   source?: string
+  brokerSlug?: string
 }

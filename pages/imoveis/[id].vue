@@ -607,6 +607,7 @@ const videosToDisplay = computed(() =>
 )
 
 const normalizeWhatsappNumber = (value?: string | null) => value?.replace(/\D/g, '') ?? ''
+const brokerSlug = computed(() => typeof route.query.corretor === 'string' ? route.query.corretor : undefined)
 
 const openPropertyWhatsappGate = () => {
   if (!property.value) return
@@ -619,6 +620,7 @@ const openPropertyWhatsappGate = () => {
     targetUrl: `https://wa.me/${phone}?text=${message}`,
     source: 'PORTAL_WHATSAPP_PROPERTY',
     propertyId: property.value.id,
+    brokerSlug: brokerSlug.value,
     title: property.value.title,
   })
 }
@@ -647,6 +649,7 @@ const submitLead = async () => {
       message: leadForm.value.message || undefined,
       propertyId: property.value.id,
       source: 'PORTAL_PROPERTY_FORM',
+      brokerSlug: brokerSlug.value,
     })
     leadSuccess.value = true
     leadForm.value = { name: '', email: '', phone: '', message: '' }

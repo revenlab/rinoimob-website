@@ -1,6 +1,6 @@
 <template>
   <NuxtLink
-    :to="`/imoveis/${property.id}`"
+    :to="brokerSlug ? { path: `/imoveis/${property.id}`, query: { corretor: brokerSlug } } : `/imoveis/${property.id}`"
     class="group relative rounded-2xl overflow-hidden block bg-slate-100 flex-shrink-0 transition-all duration-300 hover:shadow-2xl hover:-translate-y-1"
     :class="cardAspectRatioClass"
   >
@@ -86,10 +86,12 @@ import { HeartIcon as HeartSolidIcon } from '@heroicons/vue/24/solid'
 const props = withDefaults(defineProps<{
   property: PublicPropertySummary
   whatsappNumber?: string | null
+  brokerSlug?: string | null
   cardVariant?: 'default' | 'vertical'
   pricePrefix?: string
 }>(), {
   whatsappNumber: null,
+  brokerSlug: null,
   cardVariant: 'default',
   pricePrefix: '',
 })
@@ -112,6 +114,7 @@ const openPropertyWhatsappGate = () => {
     targetUrl: `https://wa.me/${phone}?text=${message}`,
     source: 'PORTAL_WHATSAPP_HOME',
     propertyId: props.property.id,
+    brokerSlug: props.brokerSlug ?? undefined,
     title: props.property.title,
   })
 }
