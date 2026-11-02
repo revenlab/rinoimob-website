@@ -4,6 +4,7 @@
   "type": "module",
   "scripts": {
     "build": "nuxi build",
+    "test:public": "node --test tests/*.test.mjs",
     "dev": "nuxi dev",
     "generate": "nuxi generate",
     "preview": "nuxi preview",

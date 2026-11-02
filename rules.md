@@ -168,3 +168,6 @@ await createLead(resolveSlug(), { name, email, phone, message })
 - **Comercialização por planta**: o detalhe do imóvel exibe valores e cômodos de cada planta e prioriza o menor preço inicial como "A partir de", mantendo o preço geral do imóvel como fallback.
 
 - **Serviços da home (#54, consolidação 2026-11-02)**: `useTenantConfig` preserva `servicesItems`; a home renderiza a ordem recebida, prefere imagem a emoji e mantém defaults para dados vazios/inválidos. Smoke SSR local validou as três condições.
+
+- **Conclusão da página pública de corretores (#63, 2026-11-02)**: o perfil e o catálogo agora carregam no SSR com chaves por tenant/slug; ausência retorna 404, indisponibilidade e catálogo vazio possuem estados distintos e há paginação por Carregar mais. Links e captação de leads preservam o slug comercial, sem incluir IDs internos nos links.
+- `npm run test:public` executa o Nuxt previamente compilado contra uma API local simulada e verifica serviços, perfil com iniciais, referência nos links, paginação visível e estados 404/erro. Execute `npm run build` antes dos testes; eles precisam abrir portas locais temporárias.

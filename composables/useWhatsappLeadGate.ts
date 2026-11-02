@@ -5,6 +5,7 @@ type WhatsappLeadContext = {
   targetUrl: string
   source: WhatsappLeadSource
   propertyId?: string
+  brokerSlug?: string
   title?: string
 }
 
