@@ -156,6 +156,7 @@ const submit = async () => {
       email: email || undefined,
       propertyId: context.value.propertyId,
       source: context.value.source,
+      brokerSlug: context.value.brokerSlug,
     })
 
     const targetUrl = context.value.targetUrl

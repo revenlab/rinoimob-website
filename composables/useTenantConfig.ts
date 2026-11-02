@@ -25,6 +25,7 @@ const mergeTenantConfig = (config?: Partial<TenantWebsiteConfig> | null): Tenant
   categoriesSectionSubtitle: config?.categoriesSectionSubtitle ?? DEFAULT_TENANT_CONFIG.categoriesSectionSubtitle,
   servicesSectionTitle: config?.servicesSectionTitle ?? DEFAULT_TENANT_CONFIG.servicesSectionTitle,
   servicesSectionSubtitle: config?.servicesSectionSubtitle ?? DEFAULT_TENANT_CONFIG.servicesSectionSubtitle,
+  servicesItems: config?.servicesItems ?? DEFAULT_TENANT_CONFIG.servicesItems,
   servicesFormTitle: config?.servicesFormTitle ?? DEFAULT_TENANT_CONFIG.servicesFormTitle,
   servicesFormSubtitle: config?.servicesFormSubtitle ?? DEFAULT_TENANT_CONFIG.servicesFormSubtitle,
   statsSectionTitle: config?.statsSectionTitle ?? DEFAULT_TENANT_CONFIG.statsSectionTitle,

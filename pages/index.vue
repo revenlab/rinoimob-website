@@ -378,7 +378,9 @@
             <ul class="space-y-5">
               <li v-for="srv in services" :key="srv.title" class="flex items-start gap-4">
                 <div class="w-7 h-7 rounded-full bg-white/20 flex items-center justify-center flex-shrink-0 mt-0.5">
-                  <svg class="w-3.5 h-3.5 text-white" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor">
+                  <img v-if="srv.imageUrl" :src="srv.imageUrl" :alt="`Ícone de ${srv.title}`" class="h-5 w-5 rounded object-cover" />
+                  <span v-else-if="srv.icon" class="text-base leading-none" aria-hidden="true">{{ srv.icon }}</span>
+                  <svg v-else class="w-3.5 h-3.5 text-white" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor">
                     <path stroke-linecap="round" stroke-linejoin="round" d="M4.5 12.75l6 6 9-13.5" />
                   </svg>
                 </div>
@@ -864,24 +866,49 @@ function withOpacity(hex: string, opacity: number) {
   return `#${clean}${alpha}`.toUpperCase()
 }
 
-const services = [
+const defaultServices = [
   {
     title: 'Assessoria jurídica completa',
     description: 'Análise contratual e suporte legal do início ao fim da negociação.',
+    icon: '⚖️',
   },
   {
     title: 'Fotografia profissional e tour virtual',
     description: 'Imagens de alta qualidade e visita 360° para atrair mais compradores.',
+    icon: '📸',
   },
   {
     title: 'Avaliação gratuita do imóvel',
     description: 'Descubra o preço justo de mercado com nossa análise especializada.',
+    icon: '🏠',
   },
   {
     title: 'Consultoria para financiamento',
     description: 'Te ajudamos a encontrar as melhores condições de crédito imobiliário.',
+    icon: '💳',
   },
 ]
+
+const services = computed(() => {
+  if (!cfg.value.servicesItems) return defaultServices
+  try {
+    const parsed: unknown = JSON.parse(cfg.value.servicesItems)
+    if (!Array.isArray(parsed)) return defaultServices
+    const valid = parsed
+      .filter((item): item is { title: string; description: string; icon?: string; imageUrl?: string } =>
+        !!item && typeof item === 'object' && typeof (item as { title?: unknown }).title === 'string' && typeof (item as { description?: unknown }).description === 'string')
+      .map(item => ({
+        title: item.title.trim(),
+        description: item.description.trim(),
+        icon: typeof item.icon === 'string' ? item.icon.trim() : '',
+        imageUrl: typeof item.imageUrl === 'string' ? item.imageUrl.trim() : '',
+      }))
+      .filter(item => item.title && item.description)
+    return valid.length ? valid : defaultServices
+  } catch {
+    return defaultServices
+  }
+})
 
 const stats = [
   {
