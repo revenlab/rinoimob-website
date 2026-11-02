@@ -166,3 +166,5 @@ await createLead(resolveSlug(), { name, email, phone, message })
 - **Gate de WhatsApp com lead (#45)**: CTAs públicos que antes abriam `wa.me` diretamente agora passam por `WhatsappLeadGateModal.vue`, que captura `name` + `phone` (e `email` opcional), cria lead via `/api/v1/public/leads` com origem `PORTAL_WHATSAPP_*` e só então redireciona; o estado global fica em `composables/useWhatsappLeadGate.ts`.
 - **CTA WhatsApp na página Sobre**: `pages/sobre.vue` agora usa `useWhatsappLeadGate()` no botão "Falar no WhatsApp", mantendo a captura de lead antes do redirecionamento também na rota `/sobre`.
 - **Comercialização por planta**: o detalhe do imóvel exibe valores e cômodos de cada planta e prioriza o menor preço inicial como "A partir de", mantendo o preço geral do imóvel como fallback.
+
+- **Serviços da home (#54, consolidação 2026-11-02)**: `useTenantConfig` preserva `servicesItems`; a home renderiza a ordem recebida, prefere imagem a emoji e mantém defaults para dados vazios/inválidos. Smoke SSR local validou as três condições.
